@@ -1,0 +1,10 @@
+flask
+python-dotenv
+stripe
+mysql-connector-python
+sqlalchemy
+pymysql
+requests
+gunicorn
+fpdf2
+cryptography

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Viajes Cosmin</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #2c3e50; color: #ecf0f1; }
+        .search-container { background: #34495e; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 10px; }
+        input { flex-grow: 1; padding: 10px; border: none; border-radius: 4px; }
+        button { background: #27ae60; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; background: #34495e; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #46627f; }
+        th { background: #1abc9c; color: white; }
+        ul.pax-list { list-style: none; padding: 0; margin: 0; }
+        ul.pax-list li { padding: 4px 0; border-bottom: 1px dashed #566e85; font-size: 0.9rem; }
+        .dni-tag { color: #f1c40f; font-size: 0.85rem; margin-left: 5px; }
+        .btn-descargar { background: #3498db; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <h1>🛡️ Centro de Mando</h1>
+    <div class="search-container">
+        <form action="/admin" method="GET" style="width:100%; display:flex; gap:10px;">
+            <input type="text" name="q" placeholder="Buscar pasajero, DNI, pagador..." value="{{ busqueda }}">
+            <button type="submit">Buscar</button>
+            {% if busqueda %}
+            <a href="/admin" style="background:#e74c3c; padding:10px; color:white; text-decoration:none; border-radius:4px;">X</a>
+            {% endif %}
+        </form>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th><th>Expediente</th><th>Titular</th><th>Pasajeros</th><th>Total</th><th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venta in ventas %}
+            <tr>
+                <td>{{ venta.fecha }}</td>
+                <td style="font-family:monospace; color:#81ecec;">
+                    {% if venta.codigo %} {{ venta.codigo }} {% else %} Pendiente {% endif %}
+                </td>
+                <td>{{ venta.pagador }}</td>
+                <td>
+                    <ul class="pax-list">
+                        {% for p in venta.pasajeros %}
+                        <li>👤 {{ p.nombre }} <span class="dni-tag">🆔 {{ p.dni }}</span></li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td style="color:#2ecc71; font-weight:bold;">{{ venta.total }} €</td>
+                <td><a href="/descargar/{{ venta.factura }}" class="btn-descargar">⬇ PDF</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

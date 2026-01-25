@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # --- TU APLICACIÓN WEB ---
+  web:
+    build: .
+    container_name: agencia_viajes_web
+    restart: always
+    ports:
+      - "4242:4242"
+    # AQUÍ ESTÁ LA MAGIA DEL AUTO-UPDATE:
+    volumes:
+      - .:/app  # <--- Conecta tu carpeta actual con la del contenedor
+    # Usamos '--reload' para que Gunicorn reinicie si detecta cambios
+    command: gunicorn --bind 0.0.0.0:4242 --workers 4 --threads 2 --reload app:app
+    environment:
+      - DB_HOST=db  # <--- Importante: Ahora el host se llama 'db', no localhost
+      - DB_USER=root
+      - DB_PASSWORD=tu_password_secreto
+      - DB_NAME=agencia_viajes
+      # Pasa aquí tus claves de API o usa env_file
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - AMADEUS_CLIENT_ID=${AMADEUS_CLIENT_ID}
+      - AMADEUS_CLIENT_SECRET=${AMADEUS_CLIENT_SECRET}
+    depends_on:
+      - db
+
+  # --- TU BASE DE DATOS MYSQL ---
+  db:
+    image: mysql:8.0
+    container_name: agencia_viajes_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: tu_password_secreto
+      MYSQL_DATABASE: agencia_viajes
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql # Esto guarda los datos aunque apagues Docker
+
+volumes:
+  mysql_data:

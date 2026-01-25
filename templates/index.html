@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reservas - Viajes Cosmin</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f9; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .card img { width: 100%; height: 200px; object-fit: cover; }
+        .content { padding: 20px; }
+        .price { font-size: 1.5rem; color: #27ae60; font-weight: bold; }
+        button { width: 100%; padding: 10px; background: #6772e5; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 500px; max-height:90vh; overflow-y:auto; }
+        .pax-item { background: #f8f9fa; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        input { width: 100%; padding: 8px; margin: 5px 0; box-sizing: border-box; }
+        .btn-add { background: #e8f5e9; color: #2e7d32; border: 1px dashed #2e7d32; margin-bottom: 10px; }
+        .close { background: #ccc; margin-top: 10px; color: black; }
+    </style>
+</head>
+<body>
+    <h1 style="text-align:center;">✈️ Destinos</h1>
+    <div class="grid">
+        {% for viaje in viajes %}
+        <div class="card">
+            <img src="{{ viaje[4] }}">
+            <div class="content">
+                <h3>{{ viaje[1] }}</h3>
+                <p>{{ viaje[2] }}</p>
+                <p class="price">{{ viaje[3] }} €</p>
+                <button onclick="abrir('{{viaje[0]}}', '{{viaje[1]}}', {{viaje[3]}})">Reservar</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2 id="mTitle">Reservar</h2>
+            <form action="/create-checkout-session" method="POST">
+                <input type="hidden" name="id_viaje" id="id_viaje">
+                <div id="pax-list"></div>
+                <button type="button" class="btn-add" onclick="addPax()">+ Añadir Pasajero</button>
+                <h3 style="text-align:right;">Total: <span id="total">0</span> €</h3>
+                <button type="submit">Pagar</button>
+                <button type="button" class="close" onclick="cerrar()">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let precio = 0, count = 0;
+        function abrir(id, nom, pr) {
+            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('id_viaje').value = id;
+            document.getElementById('mTitle').innerText = nom;
+            precio = pr;
+            document.getElementById('pax-list').innerHTML = '';
+            count = 0; addPax();
+        }
+        function cerrar() { document.getElementById('modal').style.display = 'none'; }
+        function addPax() {
+            count++;
+            let div = document.createElement('div'); div.className = 'pax-item';
+            div.innerHTML = `<b>Pasajero ${count}</b><input name="nombres[]" placeholder="Nombre" required><input name="dnis[]" placeholder="DNI" required>`;
+            document.getElementById('pax-list').appendChild(div);
+            actualizar();
+        }
+        function actualizar() { document.getElementById('total').innerText = (count * precio).toFixed(2); }
+    </script>
+</body>
+</html>
