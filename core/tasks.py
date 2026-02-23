@@ -1,49 +1,39 @@
 import hashlib
-import threading
 import os
-import smtplib
-from fpdf import FPDF
-from fpdf.enums import XPos, YPos
-from email.message import EmailMessage
-from core.database import get_db_connection
+from cryptography.fernet import Fernet
+from database import get_db_connection
+
+# Inicializar Fernet
+FERNET_KEY = os.getenv("ENCRYPTION_KEY").encode()
+cipher_suite = Fernet(FERNET_KEY)
 
 def generar_hash_dni(dni):
-    """Crea una huella digital única (no reversible) para búsquedas ultra rápidas"""
-    # Usamos una 'sal' (salt) para mayor seguridad. Cámbiala por algo secreto.
+    """Búsqueda rápida (No reversible)"""
     salt = "COSMIN_SECRET_2026"
     return hashlib.sha256((dni + salt).encode()).hexdigest()
 
-class FacturaPDF(FPDF):
-    def header(self):
-        self.set_font("Helvetica", "B", 15)
-        self.cell(0, 10, "FACTURA DE VENTA - AGENCIA VIAJES", align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-        self.ln(10)
+def cifrar_dato(dato):
+    """Cifrado reversible para recuperación de datos"""
+    if not dato: return None
+    return cipher_suite.encrypt(dato.encode())
 
-def procesar_venta_background(email_cliente, nombre_pagador, lista_pasajeros, total, concepto, id_expediente, num_factura, fuente, email_prov):
-    # 1. Generar PDF (Tarea pesada)
-    pdf = FacturaPDF()
-    pdf.add_page()
-    pdf.set_font("Helvetica", "", 12)
-    pdf.cell(0, 10, f"Cliente: {nombre_pagador}")
-    pdf.ln(10)
-    pdf.cell(0, 10, f"Concepto: {concepto} | Total: {total} EUR")
+def descifrar_dato(dato_cifrado):
+    """Descifrado para mostrar en el Panel de Admin"""
+    if not dato_cifrado: return None
+    return cipher_suite.decrypt(dato_cifrado).decode()
+
+# Ejemplo de cómo usarlo al guardar un pasajero:
+def guardar_pasajero_seguro(id_expediente, nombre, dni):
+    conn = get_db_connection()
+    cursor = conn.cursor()
     
-    ruta_pdf = f"factura_{num_factura}.pdf"
-    pdf.output(ruta_pdf)
-
-    # 2. Actualizar DB (Operación atómica rápida)
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("UPDATE facturas SET url_archivo_pdf = %s WHERE numero_factura = %s", (ruta_pdf, num_factura))
-        conn.commit()
-        conn.close()
-    except Exception as e:
-        print(f"Error en worker: {e}")
-
-    # 3. Notificaciones
-    # Aquí iría el envío de SMTP (Mail)
-    print(f"✅ Tarea finalizada para {num_factura}")
-
-def lanzar_tarea_venta(email, pagador, pasajeros, total, concepto, id_exp, num_f, fuente, email_prov):
-    threading.Thread(target=procesar_venta_background, args=(email, pagador, pasajeros, total, concepto, id_exp, num_f, fuente, email_prov)).start()
+    dni_cifrado = cifrar_dato(dni)       # Para recuperar (Fernet)
+    dni_hash = generar_hash_dni(dni)    # Para buscar (SHA256)
+    
+    sql = """
+        INSERT INTO pasajeros (id_expediente, nombre_completo, dni_pasaporte_encriptado, dni_blind_index)
+        VALUES (%s, %s, %s, %s)
+    """
+    cursor.execute(sql, (id_expediente, nombre, dni_cifrado, dni_hash))
+    conn.commit()
+    conn.close()

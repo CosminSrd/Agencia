@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - Ventas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card h3 {
+            font-size: 13px;
+            color: #6c757d;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            background: #667eea;
+            color: white;
+        }
+
+        .btn:hover {
+            background: #5568d9;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e1e8ed;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Panel Admin - Ventas</h1>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Ingresos Mes Actual</h3>
+            <div class="stat-value">{{ ingresos }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Ingresos Mes Anterior</h3>
+            <div class="stat-value">{{ ingresos_ant }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Total Tours</h3>
+            <div class="stat-value">{{ viajes|length }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Total Ventas</h3>
+            <div class="stat-value">{{ ventas|length }}</div>
+        </div>
+    </div>
+
+    <!-- DUFFEL ANALYTICS -->
+    <div style="background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); margin-bottom: 20px;">
+        <h2 style="margin-bottom: 15px; color: #667eea;">✈️ Duffel - Vuelos API</h2>
+        
+        <div class="stats-grid" style="margin-bottom: 20px;">
+            <div class="stat-card" style="border-left: 4px solid #667eea;">
+                <h3>Total Busquedas</h3>
+                <div class="stat-value">{{ duffel_stats.total_busquedas }}</div>
+            </div>
+            <div class="stat-card" style="border-left: 4px solid #27ae60;">
+                <h3>Reservas Totales</h3>
+                <div class="stat-value">{{ duffel_stats.total_reservas }}</div>
+            </div>
+            <div class="stat-card" style="border-left: 4px solid #2ecc71;">
+                <h3>Confirmadas</h3>
+                <div class="stat-value">{{ duffel_stats.total_confirmadas }}</div>
+            </div>
+            <div class="stat-card" style="border-left: 4px solid #e74c3c;">
+                <h3>Canceladas</h3>
+                <div class="stat-value">{{ duffel_stats.total_canceladas }}</div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px;">
+            <div>
+                <h3 style="font-size: 14px; color: #6c757d; margin-bottom: 10px;">🛫 Top Origenes</h3>
+                <ul style="list-style: none; padding: 0;">
+                {% for origen in duffel_stats.top_origenes[:5] %}
+                    <li style="padding: 8px 0; border-bottom: 1px solid #e1e8ed;">
+                        <strong>{{ origen[0] }}</strong> <span style="color: #667eea;">{{ origen[1] }} busquedas</span>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+            <div>
+                <h3 style="font-size: 14px; color: #6c757d; margin-bottom: 10px;">🛬 Top Destinos</h3>
+                <ul style="list-style: none; padding: 0;">
+                {% for destino in duffel_stats.top_destinos[:5] %}
+                    <li style="padding: 8px 0; border-bottom: 1px solid #e1e8ed;">
+                        <strong>{{ destino[0] }}</strong> <span style="color: #667eea;">{{ destino[1] }} busquedas</span>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+            <div>
+                <h3 style="font-size: 14px; color: #6c757d; margin-bottom: 10px;">✈️ Top Rutas</h3>
+                <ul style="list-style: none; padding: 0;">
+                {% for ruta in duffel_stats.top_rutas[:5] %}
+                    <li style="padding: 8px 0; border-bottom: 1px solid #e1e8ed;">
+                        <strong>{{ ruta[0] }} → {{ ruta[1] }}</strong> <span style="color: #667eea;">{{ ruta[2] }} veces</span>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <h3 style="margin-bottom: 12px;">Reservas Duffel</h3>
+        {% if duffel_reservas and duffel_reservas|length > 0 %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Codigo</th>
+                        <th>Email</th>
+                        <th>Precio</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for r in duffel_reservas %}
+                    <tr>
+                        <td><strong>{{ r.codigo_reserva }}</strong></td>
+                        <td>{{ r.email_cliente }}</td>
+                        <td>{{ r.precio_total }} EUR</td>
+                        <td>
+                            {% if r.estado == 'CONFIRMADO' %}
+                            <span style="background: #d4edda; color: #155724; padding: 4px 8px; border-radius: 12px; font-size: 12px;">{{ r.estado }}</span>
+                            {% elif r.estado == 'CANCELADO' %}
+                            <span style="background: #f8d7da; color: #721c24; padding: 4px 8px; border-radius: 12px; font-size: 12px;">{{ r.estado }}</span>
+                            {% elif r.estado == 'ERROR' %}
+                            <span style="background: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 12px; font-size: 12px;">{{ r.estado }}</span>
+                            {% else %}
+                            <span style="background: #e7f3ff; color: #004085; padding: 4px 8px; border-radius: 12px; font-size: 12px;">{{ r.estado }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ r.fecha_creacion.strftime('%d/%m/%Y %H:%M') if r.fecha_creacion else 'N/A' }}</td>
+                        <td>
+                            {% if r.estado == 'CONFIRMADO' and r.order_id_duffel %}
+                            <form method="POST" action="/my-admin/duffel/cancel/{{ r.id }}" style="display: inline;" onsubmit="return confirm('¿Seguro cancelar {{ r.codigo_reserva }}?');">
+                                <button type="submit" style="padding: 4px 8px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Cancelar</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state" style="padding: 20px;">No hay reservas Duffel.</div>
+        {% endif %}
+    </div>
+
+    <div class="content-card">
+        <form method="GET" action="/my-admin" class="search-bar">
+            <input type="text" name="q" class="search-input" placeholder="Buscar cliente o codigo" value="{{ busqueda }}">
+            <button type="submit" class="btn">Buscar</button>
+            {% if busqueda %}
+            <a href="/my-admin" class="btn" style="background: #6c757d;">Limpiar</a>
+            {% endif %}
+        </form>
+
+        <h2 style="margin-bottom: 12px;">Ventas Recientes</h2>
+        <div class="table-container">
+            {% if ventas and ventas|length > 0 %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Codigo</th>
+                        <th>Cliente</th>
+                        <th>Viaje</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in ventas %}
+                    <tr>
+                        <td>{{ v.codigo_expediente }}</td>
+                        <td>{{ v.cliente }}</td>
+                        <td>{{ v.viaje_nombre }}</td>
+                        <td>{{ v.total_venta }}</td>
+                        <td>{{ v.estado }}</td>
+                        <td>{{ v.fecha_creacion }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">No hay ventas para mostrar.</div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+
+</html>

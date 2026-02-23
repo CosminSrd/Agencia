@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='imagenes/logosintexto.png') }}">
+    <title>Cruceros Exclusive | Viatges Carcaixent</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+
+    <header class="main-header" id="top">
+        <div class="logo-container">
+            <a href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="Viatges Carcaixent"
+                    class="logo-premium">
+            </a>
+        </div>
+        <nav class="nav-menu">
+            <ul>
+                <li><a href="{{ url_for('home') }}" class="nav-link">Inicio</a></li>
+                <li><a href="{{ url_for('destinos') }}" class="nav-link">Destinos</a></li>
+                <li><a href="{{ url_for('cruceros') }}" class="nav-link active">Cruceros</a></li>
+                <li><a href="{{ url_for('ofertas') }}" class="nav-link">Ofertas</a></li>
+                <li><a href="{{ url_for('checkin') }}" class="nav-link">Check-in</a></li>
+                <li><a href="{{ url_for('contacto') }}" class="nav-link">Contacto</a></li>
+            </ul>
+        </nav>
+        <a href="{{ url_for('presupuesto') }}" class="btn-presupuesto">PEDIR PRESUPUESTO</a>
+    </header>
+
+    <section class="hero-cruceros-v3">
+        <div class="hero-bg">
+            <img src="https://images.unsplash.com/photo-1548574505-5e239809ee19?q=80&w=2000"
+                alt="Cruceros Viatges Carcaixent">
+            <div class="hero-overlay-gradient"></div>
+        </div>
+
+        <div class="hero-content-luxe">
+            <div class="tag-año">COLECCIÓN EXCLUSIVA 2026</div>
+            <h1>Navega hacia donde <br><span class="gold-text">el mar se vuelve historia.</span></h1>
+            <div class="divider-gold"></div>
+            <p>Itinerarios diseñados a mano por Andrea, sin plantillas ni guiones. <br> Solo tú y el horizonte.</p>
+
+            <div class="scroll-indicator">
+                <div class="mouse">
+                    <div class="wheel"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="navieras-premium-v4">
+        <div class="nav-row" data-aos="fade-up">
+            <div class="nav-col-img">
+                <img src="{{ url_for('static', filename='imagenes/msccru.jpg') }}" alt="MSC Experience"
+                    class="bg-parallax">
+                <div class="nav-overlay"></div>
+                <div class="nav-logo-overlay">
+                    <img src="{{ url_for('static', filename='imagenes/msc-cruises-1.svg') }}" class="msc-giant-v4"
+                        alt="MSC">
+                </div>
+            </div>
+            <div class="nav-col-text">
+                <span class="nav-tag">EXPERIENCIA MEDITERRÁNEA</span>
+                <h3>El Arte de <span>Navegar</span></h3>
+                <p>Descubre el lujo italiano con la flota más joven del mundo. Gastronomía premium y entretenimiento sin
+                    fin.</p>
+                <div class="nav-features">
+                    <span><i class="fas fa-check"></i> Yacht Club</span>
+                    <span><i class="fas fa-check"></i> Gastronomía Gourmet</span>
+                </div>
+                <a href="#destinos-list" id="btn-filter-med" class="btn-luxe">EXPLORAR DESTINOS</a>
+            </div>
+        </div>
+
+        <div class="nav-row reverse" data-aos="fade-up">
+            <div class="nav-col-img">
+                <img src="{{ url_for('static', filename='imagenes/royalcru.jpg') }}" alt="Royal Caribbean"
+                    class="bg-parallax">
+                <div class="nav-overlay"></div>
+                <div class="nav-logo-overlay">
+                    <img src="{{ url_for('static', filename='imagenes/royal-caribbean-logo-1.svg') }}"
+                        class="royal-giant-v4" alt="Royal Caribbean">
+                </div>
+            </div>
+            <div class="nav-col-text">
+                <span class="nav-tag">ADRENALINA Y RELAX</span>
+                <h3>Aventuras <span>Sin Límites</span></h3>
+                <p>La mayor innovación tecnológica en alta mar. Parques acuáticos, espectáculos de Broadway e islas
+                    privadas.</p>
+                <div class="nav-features">
+                    <span><i class="fas fa-check"></i> Perfect Day at CocoCay</span>
+                    <span><i class="fas fa-check"></i> FlowRider</span>
+                </div>
+                <a href="#destinos-list" id="btn-filter-others" class="btn-luxe">VER ITINERARIOS</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="cruceros-explorer-v2">
+        <div class="explorer-container">
+            <div class="explorer-header" data-aos="fade-up">
+                <span class="gold-subtitle">COLECCIÓN EXCLUSIVA 2026</span>
+                <h2>Destinos <span>Diseñados a Mano</span></h2>
+            </div>
+
+            <div class="region-selector" id="destinos-list">
+
+                <!-- INYECTAMOS DATOS DE LA DB PARA JS -->
+                <script id="cruises-data" type="application/json">
+                    [
+                    {% for tour in viajes %}
+                        {
+                            "id": "{{ tour.id }}",
+                            "titulo": "{{ tour.titulo }}",
+                            "destino": "{{ tour.destino }}",
+                            "precio": "{{ tour.precio_desde }}",
+                            "img": "{{ tour.imagen_url }}",
+                            "desc": "{{ tour.descripcion }}",
+                            "itinerario": {{ (tour.itinerario or []) | tojson | safe }}
+                        }{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                    ]
+                </script>
+                <script>
+                    window.CRUISES_DATA = JSON.parse(document.getElementById('cruises-data').textContent);
+                </script>
+
+                {% for tour in viajes %}
+                <div class="region-item" data-region="{{ tour.destino }}" data-aos="fade-right">
+                    <div class="region-main-content">
+                        <span class="region-num">{{ "%02d" % loop.index }}</span>
+                        <div class="text-holder">
+                            <h3>{{ tour.titulo }}</h3>
+                            <div class="text-mask">
+                                <p>{{ tour.descripcion }}</p>
+                            </div>
+                        </div>
+                        <!-- BOTE MODAL RESERVA SIMPLE -->
+                        <a href="#" class="explore-btn-premium"
+                            onclick="abrirModalReserva('{{ tour.id }}', '{{ tour.titulo }}', '{{ tour.precio_desde }}', '{{ tour.imagen_url }}'); return false;">
+                            RESERVAR <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                    <div class="region-visual">
+                        <div class="img-frame">
+                            <div class="bg-img" style="background-image: url('{{ tour.imagen_url }}');"></div>
+                            <div class="img-overlay-gold"></div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    // NOTA: La lógica de sidebar se manejará en script.js usando window.CRUISES_DATA
+                    // Aquí solo definimos los IDs para que script.js los encuentre.
+                });
+            </script>
+        </div>
+    </section>
+
+    <section class="propuesta-valor">
+        <div class="container-premium">
+            <div class="valor-grid">
+                <div class="valor-text" data-aos="fade-right">
+                    <span class="gold-tag">¿POR QUÉ CON NOSOTROS?</span>
+                    <h2>Más que un viaje, <br><span>una firma de autor.</span></h2>
+                    <p>En Viatges Carcaixent sabemos que Andrea no solo vende camarotes; vende recuerdos. Por eso, cada
+                        reserva incluye nuestra gestión premium.</p>
+
+                    <ul class="ventajas-list">
+                        <li><i class="fas fa-crown"></i> <span>Atención personalizada 24/7 durante tu travesía.</span>
+                        </li>
+                        <li><i class="fas fa-gem"></i> <span>Gestión de visados, vuelos y traslados sin coste
+                                oculto.</span></li>
+                        <li><i class="fas fa-star"></i> <span>Ventajas exclusivas en paquetes de bebidas y
+                                excursiones.</span></li>
+                    </ul>
+                </div>
+
+                <div class="valor-cta" data-aos="zoom-in">
+                    <div class="cta-card">
+                        <h3>¿Tienes dudas?</h3>
+                        <p>Hablemos ahora mismo por WhatsApp y diseñemos tu ruta.</p>
+                        <a href="https://wa.me/tu-numero" class="btn-whatsapp-luxe">
+                            <i class="fab fa-whatsapp"></i> HABLAR CON ANDREA
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-info">
+                <a href="{{ url_for('home') }}">
+                    <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="Viatges Carcaixent"
+                        class="footer-logo">
+                </a>
+                <p>Tu agencia de confianza en Carcaixent. Diseñamos experiencias, no solo viajes.</p>
+            </div>
+
+            <div class="footer-links">
+                <h4>EXPLORA</h4>
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Inicio</a></li>
+                    <li><a href="{{ url_for('destinos') }}">Destinos</a></li>
+                    <li><a href="{{ url_for('cruceros') }}">Cruceros</a></li>
+                    <li><a href="{{ url_for('ofertas') }}">Ofertas</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-contact">
+                <h4>CONTACTO</h4>
+                <p class="contact-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="footer-icon">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    Calle Mayor, Carcaixent
+                </p>
+                <p class="contact-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="footer-icon">
+                        <path
+                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l2.27-2.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                        </path>
+                    </svg>
+                    +34 000 000 000
+                </p>
+                <p class="contact-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="footer-icon">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    info@viatgescarcaixent.com
+                </p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Viatges Carcaixent - Todos los derechos reservados.</p>
+            <p class="rsw-signature">Crafted by <span>RSW Studio</span></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+    <script src="{{ url_for('static', filename='style/script.js') }}"></script>
+    <div id="side-panel-overlay" class="side-panel-overlay"></div>
+
+    <div id="side-panel" class="side-panel">
+        <button class="close-panel"><i class="fas fa-times"></i></button>
+        <div id="panel-content" class="panel-content">
+        </div>
+    </div>
+</body>
+
+</html>

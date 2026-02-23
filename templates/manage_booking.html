@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar mi Viaje | Viatges Carcaixent</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #6366f1;
+            --surface: #f8fafc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+        }
+
+        .portal-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .header-section {
+            margin-bottom: 30px;
+        }
+
+        .header-section h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .booking-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .service-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .service-card:hover {
+            border-color: var(--accent);
+            background: #fcfcff;
+            transform: translateY(-3px);
+        }
+
+        .service-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .service-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .service-desc {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .badge-status {
+            background: #dcfce7;
+            color: #166534;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="main-header">
+        <div class="logo-container">
+            <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='imagenes/logo.png') }}"
+                    class="logo-premium"></a>
+        </div>
+    </header>
+
+    <div class="portal-container">
+        <div class="header-section">
+            <div class="badge-status">Reserva Confirmada</div>
+            <h1>Gestionar mi Viaje</h1>
+            <p style="color: #64748b;">Localizador: <strong>{{ booking_ref }}</strong></p>
+        </div>
+
+        <div class="booking-card">
+            <h3>🛄 Servicios Adicionales</h3>
+            <p>Personaliza tu experiencia de vuelo incluso después de la compra.</p>
+            <div class="service-grid">
+                <div class="service-card" onclick="location.href='/api/vuelos/order/{{ order_id }}/add-baggage'">
+                    <div class="service-icon">🧳</div>
+                    <span class="service-title">Añadir Equipaje</span>
+                    <span class="service-desc">Añade maletas de cabina o bodega a tu reserva.</span>
+                </div>
+                <div class="service-card" onclick="location.href='/api/vuelos/order/{{ order_id }}/seats'">
+                    <div class="service-icon">💺</div>
+                    <span class="service-title">Elegir Asientos</span>
+                    <span class="service-desc">Selecciona tu lugar preferido en el avión.</span>
+                </div>
+                <div class="service-card" onclick="window.print()">
+                    <div class="service-icon">📄</div>
+                    <span class="service-title">Descargar Factura</span>
+                    <span class="service-desc">Obtén el comprobante de tu compra en PDF.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="booking-card" style="border-left: 4px solid #ef4444;">
+            <h3>⚠️ Acciones de Cancelación</h3>
+            <p>Verifica las condiciones de reembolso y cancelación de tu aerolínea.</p>
+            <button class="btn" style="background: #ef4444; width: auto; padding: 12px 25px;">Gestionar
+                Cancelación</button>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,188 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "agencia-viajes",
+    "title": "Agencia de Viajes - Dashboard Principal",
+    "tags": ["agencia", "flask", "duffel"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 0,
+    "refresh": "10s",
+    "panels": [
+      {
+        "id": 1,
+        "type": "stat",
+        "title": "Búsquedas de Vuelos (Total)",
+        "targets": [
+          {
+            "expr": "sum(agencia_vuelos_buscados_total)",
+            "legendFormat": "Total Búsquedas"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": 2,
+        "type": "stat",
+        "title": "Reservas Creadas",
+        "targets": [
+          {
+            "expr": "sum(agencia_reservas_creadas_total)",
+            "legendFormat": "Total Reservas"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 6,
+          "y": 0
+        }
+      },
+      {
+        "id": 3,
+        "type": "stat",
+        "title": "Pagos Completados",
+        "targets": [
+          {
+            "expr": "sum(agencia_pagos_completados_total{estado='completado'})",
+            "legendFormat": "Pagos OK"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 12,
+          "y": 0
+        }
+      },
+      {
+        "id": 4,
+        "type": "stat",
+        "title": "Ingresos Totales (EUR)",
+        "targets": [
+          {
+            "expr": "sum(agencia_monto_pagos_euros_sum)",
+            "legendFormat": "Total €"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 18,
+          "y": 0
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyEUR"
+          }
+        }
+      },
+      {
+        "id": 5,
+        "type": "graph",
+        "title": "Requests por Segundo",
+        "targets": [
+          {
+            "expr": "rate(flask_http_request_total[5m])",
+            "legendFormat": "{{method}} {{endpoint}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 4
+        }
+      },
+      {
+        "id": 6,
+        "type": "graph",
+        "title": "Tiempo de Respuesta Duffel API",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(agencia_duffel_response_seconds_bucket[5m]))",
+            "legendFormat": "p95 {{endpoint}}"
+          },
+          {
+            "expr": "histogram_quantile(0.50, rate(agencia_duffel_response_seconds_bucket[5m]))",
+            "legendFormat": "p50 {{endpoint}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 4
+        },
+        "yaxes": [
+          {
+            "format": "s"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "type": "graph",
+        "title": "Cache Hit Rate",
+        "targets": [
+          {
+            "expr": "rate(agencia_cache_hits_total[5m]) / (rate(agencia_cache_hits_total[5m]) + rate(agencia_cache_misses_total[5m]))",
+            "legendFormat": "Hit Rate"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 8,
+          "x": 0,
+          "y": 12
+        },
+        "yaxes": [
+          {
+            "format": "percentunit",
+            "max": 1,
+            "min": 0
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "type": "graph",
+        "title": "Errores de API",
+        "targets": [
+          {
+            "expr": "rate(agencia_errores_api_total[5m])",
+            "legendFormat": "{{api}} - {{endpoint}}"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 8,
+          "x": 8,
+          "y": 12
+        }
+      },
+      {
+        "id": 9,
+        "type": "stat",
+        "title": "Tours Activos",
+        "targets": [
+          {
+            "expr": "agencia_tours_activos",
+            "legendFormat": "Tours"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 8,
+          "x": 16,
+          "y": 12
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación Exitosa</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0fdf4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+        }
+
+        h1 {
+            color: #166534;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #4b5563;
+        }
+
+        .icon {
+            font-size: 60px;
+            color: #22c55e;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <div class="icon">✅</div>
+        <h1>Acción Completada</h1>
+        <p>{{ msg }}</p>
+        <p style="font-size: 0.8em; margin-top: 20px;">Puedes cerrar esta ventana.</p>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='imagenes/logosintexto.png') }}">
+    <title>Configurador de Viajes | Viatges Carcaixent</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,700;0,900;1,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+</head>
+
+<body class="page-presupuesto">
+
+    <header class="main-header">
+        <div class="logo-container">
+            <a href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="Viatges Carcaixent"
+                    class="logo-premium">
+            </a>
+        </div>
+        <nav class="nav-menu">
+            <ul>
+                <li><a href="{{ url_for('home') }}" class="nav-link">Inicio</a></li>
+                <li><a href="{{ url_for('destinos') }}" class="nav-link">Destinos</a></li>
+                <li><a href="{{ url_for('cruceros') }}" class="nav-link">Cruceros</a></li>
+                <li><a href="{{ url_for('ofertas') }}" class="nav-link">Ofertas</a></li>
+                <li><a href="{{ url_for('checkin') }}" class="nav-link">Check-in</a></li>
+                <li><a href="{{ url_for('contacto') }}" class="nav-link">Contacto</a></li>
+            </ul>
+        </nav>
+        <a href="{{ url_for('presupuesto') }}" class="btn-presupuesto-nav">PEDIR PRESUPUESTO</a>
+    </header>
+
+    <main class="presupuesto-content">
+        <div class="stepper-modern">
+            <div class="step-item active" data-step="1"><span>01</span></div>
+            <div class="step-sep"></div>
+            <div class="step-item" data-step="2"><span>02</span></div>
+            <div class="step-sep"></div>
+            <div class="step-item" data-step="3"><span>03</span></div>
+        </div>
+
+        <form id="luxeForm">
+            <div class="step-section active" id="step1">
+                <header class="step-header-text">
+                    <span class="badge-gold">VIAJES DE AUTOR</span>
+                    <h1 class="split-text">¿Qué historia quieres <span>contar?</span></h1>
+                </header>
+
+                <div class="experience-selector">
+                    <label class="exp-card">
+                        <input type="radio" name="tipo" value="crucero" checked>
+                        <div class="exp-card-content">
+                            <div class="exp-icon"><i class="fas fa-ship"></i></div>
+                            <h3>Cruceros</h3>
+                            <p>Navegación premium.</p>
+                        </div>
+                    </label>
+                    <label class="exp-card">
+                        <input type="radio" name="tipo" value="grandes-viajes">
+                        <div class="exp-card-content">
+                            <div class="exp-icon"><i class="fas fa-globe-africa"></i></div>
+                            <h3>Grandes Viajes</h3>
+                            <p>Aventura sin límites.</p>
+                        </div>
+                    </label>
+                    <label class="exp-card">
+                        <input type="radio" name="tipo" value="novios">
+                        <div class="exp-card-content">
+                            <div class="exp-icon"><i class="fas fa-heart"></i></div>
+                            <h3>Luna de Miel</h3>
+                            <p>Momentos únicos.</p>
+                        </div>
+                    </label>
+                    <label class="exp-card">
+                        <input type="radio" name="tipo" value="safari">
+                        <div class="exp-card-content">
+                            <div class="exp-icon"><i class="fas fa-binoculars"></i></div>
+                            <h3>Safari VIP</h3>
+                            <p>Conexión salvaje.</p>
+                        </div>
+                    </label>
+                    <label class="exp-card">
+                        <input type="radio" name="tipo" value="escapada">
+                        <div class="exp-card-content">
+                            <div class="exp-icon"><i class="fas fa-spa"></i></div>
+                            <h3>Wellness</h3>
+                            <p>Relax y boutique.</p>
+                        </div>
+                    </label>
+                    <label class="exp-card">
+                        <input type="radio" name="tipo" value="business">
+                        <div class="exp-card-content">
+                            <div class="exp-icon"><i class="fas fa-briefcase"></i></div>
+                            <h3>Business Class</h3>
+                            <p>Viajes corporativos.</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="step-section" id="step2">
+                <header class="step-header-text">
+                    <span class="badge-gold">DETALLES DEL PLAN</span>
+                    <h1 class="split-text">Trazamos las <span>coordenadas</span></h1>
+                </header>
+
+                <div class="luxe-inputs">
+                    <div class="input-grid-2">
+                        <div class="floating-field">
+                            <input type="text" id="destino" placeholder=" " required>
+                            <label>Destino soñado</label>
+                        </div>
+                        <div class="floating-field">
+                            <input type="number" id="pax" placeholder=" " required>
+                            <label>Nº de Viajeros</label>
+                        </div>
+                    </div>
+
+                    <div class="extra-options">
+                        <p class="small-label-gold">¿QUÉ TIPO DE ALOJAMIENTO PREFIERES?</p>
+                        <div class="pill-group-luxe">
+                            <label class="pill-luxe">
+                                <input type="checkbox" name="alojamiento" value="boutique">
+                                <div class="pill-content"><i class="fas fa-star"></i> Hoteles Boutique</div>
+                            </label>
+                            <label class="pill-luxe">
+                                <input type="checkbox" name="alojamiento" value="resort">
+                                <div class="pill-content"><i class="fas fa-crown"></i> Resorts 5* GL</div>
+                            </label>
+                            <label class="pill-luxe">
+                                <input type="checkbox" name="alojamiento" value="villas">
+                                <div class="pill-content"><i class="fas fa-key"></i> Villas Privadas</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="budget-interaction">
+                        <div class="budget-labels">
+                            <span>Inversión estimada por persona</span>
+                            <strong id="priceLabel">3.500€</strong>
+                        </div>
+                        <input type="range" min="1000" max="20000" step="500" value="3500" class="luxe-slider-gold"
+                            id="budgetInput">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="step-section" id="step3">
+                <header class="step-header-text">
+                    <span class="badge-gold">CONEXIÓN FINAL</span>
+                    <h1 class="split-text">Dinos dónde <span>encontrarte</span></h1>
+                </header>
+
+                <div class="luxe-inputs">
+                    <div class="floating-field">
+                        <input type="text" id="nombre" placeholder=" " required>
+                        <label>Tu nombre completo</label>
+                    </div>
+                    <div class="floating-field">
+                        <input type="email" id="email" placeholder=" " required>
+                        <label>Email de contacto</label>
+                    </div>
+                    <div class="floating-field">
+                        <textarea id="mensaje" placeholder=" " rows="4"></textarea>
+                        <label>¿Algo más que Andrea deba saber?</label>
+                        <div class="textarea-line"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-nav-rsw">
+                <button type="button" class="btn-back" id="prevBtn"><i class="fas fa-arrow-left"></i> Anterior</button>
+                <button type="button" class="btn-next" id="nextBtn">SIGUIENTE PASO <i
+                        class="fas fa-arrow-right"></i></button>
+            </div>
+        </form>
+    </main>
+
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="{{ url_for('static', filename='style/script.js') }}"></script>
+</body>
+
+</html>

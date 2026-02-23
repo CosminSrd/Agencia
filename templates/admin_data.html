@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Ver Datos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e1e8ed;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .badge-pendiente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-confirmado {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-cancelado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-completado {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .badge-contactado {
+            background: #e7f3ff;
+            color: #004085;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .tab-link {
+            padding: 12px 20px;
+            text-decoration: none;
+            color: #6c757d;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s;
+            font-weight: 500;
+            background: #f8f9fa;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .tab-link:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .tab-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #e1e8ed;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>📊 Ver Todos los Datos</h1>
+    </div>
+    <div class="content-card">
+        <div class="search-bar">
+            <form method="GET" action="/admin/data" style="display: flex; gap: 10px; width: 100%;">
+                <input type="hidden" name="tab" value="{{ tab_activo }}">
+                <input type="text" name="q" class="search-input" placeholder="🔍 Buscar en {{ tab_activo }}..."
+                    value="{{ busqueda }}">
+                <button type="submit" class="btn btn-primary">Buscar</button>
+                {% if busqueda %}
+                <a href="/admin/data?tab={{ tab_activo }}" class="btn"
+                    style="background: #6c757d; color: white;">Limpiar</a>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- TABS NAVIGATION -->
+        <div
+            style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; border-bottom: 2px solid #e1e8ed; padding-bottom: 10px;">
+            <a href="?tab=destinos" class="tab-link {% if tab_activo == 'destinos' %}active{% endif %}">
+                🌍 Destinos ({{ datos.destinos|length }})
+            </a>
+            <a href="?tab=leads" class="tab-link {% if tab_activo == 'leads' %}active{% endif %}">
+                📧 Leads ({{ datos.leads|length }})
+            </a>
+            <a href="?tab=tours" class="tab-link {% if tab_activo == 'tours' %}active{% endif %}">
+                🏖️ Tours ({{ datos.tours|length }})
+            </a>
+            <a href="?tab=pedidos" class="tab-link {% if tab_activo == 'pedidos' %}active{% endif %}">
+                ✈️ Pedidos ({{ datos.pedidos|length }})
+            </a>
+            <a href="?tab=solicitudes" class="tab-link {% if tab_activo == 'solicitudes' %}active{% endif %}">
+                📋 Solicitudes ({{ datos.solicitudes|length }})
+            </a>
+            <a href="?tab=usuarios" class="tab-link {% if tab_activo == 'usuarios' %}active{% endif %}">
+                👤 Usuarios ({{ datos.usuarios|length }})
+            </a>
+            <a href="?tab=admin_users" class="tab-link {% if tab_activo == 'admin_users' %}active{% endif %}">
+                🔐 Admin Users ({{ datos.admin_users|length }})
+            </a>
+        </div>
+
+        <!-- DESTINOS -->
+        {% if tab_activo == 'destinos' %}
+        <h2 style="margin-bottom: 15px;">🌍 Destinos ({{ datos.destinos|length }})</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>País</th>
+                        <th>Precio</th>
+                        <th>Duración</th>
+                        <th>Proveedor</th>
+                        <th>Destacado</th>
+                        <th>Oferta</th>
+                        <th>Imagen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in datos.destinos %}
+                    <tr>
+                        <td>{{ d.id }}</td>
+                        <td><strong>{{ d.nombre }}</strong></td>
+                        <td>{{ d.destino_pais }}</td>
+                        <td>{{ "%.2f"|format(d.precio) }}€</td>
+                        <td>{{ d.duracion }}</td>
+                        <td>{{ d.proveedor }}</td>
+                        <td>
+                            {% if d.destacado == 1 %}
+                            <span class="badge badge-confirmado">Sí</span>
+                            {% else %}
+                            <span class="badge">No</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if d.oferta_flash == 1 %}
+                            <span class="badge badge-pendiente">Sí</span>
+                            {% else %}
+                            <span class="badge">No</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if d.imagen_url %}
+                            <a href="{{ d.imagen_url }}" target="_blank" style="color: #667eea;">🖼️ Ver</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if not datos.destinos %}
+            <div class="empty-state">
+                <h3>No hay destinos</h3>
+                <p>No se encontraron destinos en la base de datos</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- LEADS -->
+        {% if tab_activo == 'leads' %}
+        <h2 style="margin-bottom: 15px;">📧 Leads / Presupuestos ({{ datos.leads|length }})</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Destino</th>
+                        <th>Presupuesto</th>
+                        <th>Estado</th>
+                        <th>Mensaje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in datos.leads %}
+                    <tr>
+                        <td>{{ l.id }}</td>
+                        <td>{{ l.fecha }}</td>
+                        <td><strong>{{ l.nombre }}</strong></td>
+                        <td>{{ l.email }}</td>
+                        <td>{{ l.destino }}</td>
+                        <td>{{ l.presupuesto }}</td>
+                        <td>
+                            {% if l.estado == 'nuevo' %}
+                            <span class="badge badge-pendiente">Nuevo</span>
+                            {% elif l.estado == 'contactado' %}
+                            <span class="badge badge-contactado">Contactado</span>
+                            {% else %}
+                            <span class="badge badge-completado">{{ l.estado }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">{{ l.mensaje }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if not datos.leads %}
+            <div class="empty-state">
+                <h3>No hay leads</h3>
+                <p>No se encontraron solicitudes de presupuesto</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- TOURS -->
+        {% if tab_activo == 'tours' %}
+        <h2 style="margin-bottom: 15px;">🏖️ Tours ({{ datos.tours|length }})</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Título</th>
+                        <th>Destino</th>
+                        <th>Origen</th>
+                        <th>Precio Desde</th>
+                        <th>Duración</th>
+                        <th>Categoría</th>
+                        <th>Proveedor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in datos.tours %}
+                    <tr>
+                        <td>{{ t.id }}</td>
+                        <td><strong>{{ t.titulo }}</strong></td>
+                        <td>{{ t.destino }}</td>
+                        <td>{{ t.origen }}</td>
+                        <td>{{ "%.2f"|format(t.precio_desde) }}€</td>
+                        <td>{{ t.duracion_dias }} días</td>
+                        <td>{{ t.categoria }}</td>
+                        <td>{{ t.proveedor }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if not datos.tours %}
+            <div class="empty-state">
+                <h3>No hay tours</h3>
+                <p>No se encontraron tours en la base de datos</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- PEDIDOS -->
+        {% if tab_activo == 'pedidos' %}
+        <h2 style="margin-bottom: 15px;">✈️ Pedidos ({{ datos.pedidos|length }})</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Cliente</th>
+                        <th>Email</th>
+                        <th>Origen → Destino</th>
+                        <th>Precio</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in datos.pedidos %}
+                    <tr>
+                        <td>{{ p.id }}</td>
+                        <td>{{ p.fecha_creacion[:10] if p.fecha_creacion else '' }}</td>
+                        <td><span class="badge">{{ p.tipo }}</span></td>
+                        <td><strong>{{ p.nombre_cliente }} {{ p.apellidos_cliente }}</strong></td>
+                        <td>{{ p.email_cliente }}</td>
+                        <td>{{ p.origen }} → {{ p.destino }}</td>
+                        <td>{{ "%.2f"|format(p.precio_total) }}€</td>
+                        <td>
+                            {% if p.estado == 'pendiente' %}
+                            <span class="badge badge-pendiente">Pendiente</span>
+                            {% elif p.estado == 'confirmado' %}
+                            <span class="badge badge-confirmado">Confirmado</span>
+                            {% elif p.estado == 'cancelado' %}
+                            <span class="badge badge-cancelado">Cancelado</span>
+                            {% else %}
+                            <span class="badge badge-completado">{{ p.estado }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if not datos.pedidos %}
+            <div class="empty-state">
+                <h3>No hay pedidos</h3>
+                <p>No se encontraron pedidos en la base de datos</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- SOLICITUDES -->
+        {% if tab_activo == 'solicitudes' %}
+        <h2 style="margin-bottom: 15px;">📋 Solicitudes de Tours ({{ datos.solicitudes|length }})</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha</th>
+                        <th>Tour</th>
+                        <th>Cliente</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>N° Personas</th>
+                        <th>Fecha Preferida</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in datos.solicitudes %}
+                    <tr>
+                        <td>{{ s.id }}</td>
+                        <td>{{ s.fecha_creacion[:10] if s.fecha_creacion else '' }}</td>
+                        <td><strong>{{ s.tour_titulo }}</strong></td>
+                        <td>{{ s.nombre_cliente }} {{ s.apellidos_cliente }}</td>
+                        <td>{{ s.email_cliente }}</td>
+                        <td>{{ s.telefono_cliente }}</td>
+                        <td>{{ s.num_personas }}</td>
+                        <td>{{ s.fecha_preferida[:10] if s.fecha_preferida else 'N/A' }}</td>
+                        <td>
+                            {% if s.estado == 'pendiente' %}
+                            <span class="badge badge-pendiente">Pendiente</span>
+                            {% elif s.estado == 'contactado' %}
+                            <span class="badge badge-contactado">Contactado</span>
+                            {% elif s.estado == 'confirmado' %}
+                            <span class="badge badge-confirmado">Confirmado</span>
+                            {% elif s.estado == 'cancelado' %}
+                            <span class="badge badge-cancelado">Cancelado</span>
+                            {% else %}
+                            <span class="badge">{{ s.estado }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if not datos.solicitudes %}
+            <div class="empty-state">
+                <h3>No hay solicitudes</h3>
+                <p>No se encontraron solicitudes de tours</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- USUARIOS -->
+        {% if tab_activo == 'usuarios' %}
+        <h2 style="margin-bottom: 15px;">👤 Usuarios del Sistema ({{ datos.usuarios|length }})</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Activo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in datos.usuarios %}
+                    <tr>
+                        <td>{{ u.id }}</td>
+                        <td><strong>{{ u.username }}</strong></td>
+                        <td>{{ u.email }}</td>
+                        <td>
+                            {% if u.rol == 'admin' %}
+                            <span class="badge badge-confirmado">Admin</span>
+                            {% else %}
+                            <span class="badge">{{ u.rol }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if u.activo %}
+                            <span class="badge badge-confirmado">Activo</span>
+                            {% else %}
+                            <span class="badge badge-cancelado">Inactivo</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if not datos.usuarios %}
+            <div class="empty-state">
+                <h3>No hay usuarios</h3>
+                <p>No se encontraron usuarios en el sistema</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- ADMIN USERS (SQLite) -->
+        {% if tab_activo == 'admin_users' %}
+        <h2 style="margin-bottom: 15px;">🔐 Admin Users (SQLite) ({{ datos.admin_users|length }})</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in datos.admin_users %}
+                    <tr>
+                        <td>{{ a.id }}</td>
+                        <td><strong>{{ a.username }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if not datos.admin_users %}
+            <div class="empty-state">
+                <h3>No hay usuarios admin</h3>
+                <p>No se encontraron usuarios admin en SQLite</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+
+</html>

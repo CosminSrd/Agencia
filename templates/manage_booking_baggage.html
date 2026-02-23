@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Añadir Equipaje | Viatges Carcaixent</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #6366f1;
+            --surface: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .service-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .service-item {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .service-item:hover {
+            border-color: var(--accent);
+            background: #f8fafc;
+        }
+
+        .service-info {
+            flex: 1;
+        }
+
+        .service-name {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1rem;
+            display: block;
+        }
+
+        .service-desc {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .service-price {
+            font-weight: 800;
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin-left: 20px;
+        }
+
+        .btn-add {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-add:hover {
+            background: #4f46e5;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="javascript:history.back()"
+            style="color: var(--accent); text-decoration: none; font-weight: 600; margin-bottom: 20px; display: inline-block;">←
+            Volver</a>
+        <h1>🧳 Añade Equipaje a tu Reserva</h1>
+        <p style="color: #64748b; margin-bottom: 30px;">Selecciona el tipo de equipaje que deseas añadir para completar
+            tu experiencia de viaje.</p>
+
+        {% if services %}
+        <div class="service-list">
+            {% for s in services %}
+            <div class="service-item">
+                <div class="service-info">
+                    <span class="service-name">
+                        {% if 'carry_on' in s.id %}Equipaje de mano{% elif 'checked' in s.id %}Maleta facturada{% else
+                        %}Equipaje adicional{% endif %}
+                    </span>
+                    <span class="service-desc">{{ s.metadata.maximum_weight_kg }}kg de peso máximo.</span>
+                </div>
+                <div class="service-price">{{ s.total_amount }} {{ s.total_currency }}</div>
+                <button class="btn-add"
+                    onclick="bookService('{{ s.id }}', '{{ s.total_amount }}', '{{ s.total_currency }}')">Añadir</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>No hay servicios de equipaje disponibles para añadir en este momento.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        async function bookService(serviceId, amount, currency) {
+            if (!confirm('¿Deseas confirmar la compra de este servicio? Se cargará el importe indicado.')) return;
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerText = 'Procesando...';
+
+            try {
+                const response = await fetch('/api/vuelos/book-extra-service', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        order_id: '{{ order_id }}',
+                        service_id: serviceId,
+                        amount: amount,
+                        currency: currency
+                    })
+                });
+
+                const res = await response.json();
+                if (res.success) {
+                    alert('✅ Equipaje añadido con éxito.');
+                    location.reload();
+                } else {
+                    alert('❌ Error: ' + res.error);
+                    btn.disabled = false;
+                    btn.innerText = 'Añadir';
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Ocurrió un error inesperado.');
+                btn.disabled = false;
+                btn.innerText = 'Añadir';
+            }
+        }
+    </script>
+</body>
+
+</html>

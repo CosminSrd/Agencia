@@ -1,24 +1,173 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <title>Confirmación - Agencia Viajes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viaje Confirmado - Viatges Carcaixent</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #fff; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .success-card { background: #16213e; padding: 3rem; border-radius: 20px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border: 1px solid #0f3460; }
-        .icon { font-size: 4rem; color: #4ecca3; margin-bottom: 1rem; }
-        h1 { margin: 0; color: #4ecca3; }
-        p { color: #95a5a6; margin: 1.5rem 0; }
-        .btn { background: #e94560; color: white; padding: 0.8rem 2rem; text-decoration: none; border-radius: 50px; font-weight: bold; transition: 0.3s; }
-        .btn:hover { background: #ff4d6d; box-shadow: 0 0 20px rgba(233, 69, 96, 0.4); }
+        :root {
+            --primary: #0f172a;
+            --accent: #6366f1;
+            --bg-light: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #1e293b;
+            --success: #10b981;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--surface);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .icon-success {
+            font-size: 4rem;
+            color: var(--success);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        p {
+            color: #64748b;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .pnr-box {
+            background: #f0fdf4;
+            border: 2px dashed var(--success);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .label {
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            color: #15803d;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .pnr-code {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
+
+        .instructions {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .instructions h3 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .instructions ol {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: #1e293b;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
+
 <body>
-    <div class="success-card">
-        <div class="icon">✓</div>
-        <h1>¡Pago Confirmado!</h1>
-        <p>Gracias por confiar en nosotros. Tu factura se enviará automáticamente a tu email en unos segundos.</p>
-        <a href="/" class="btn">Volver al inicio</a>
+
+    <div class="card">
+        <div class="icon-success">🎉</div>
+        <h1>¡Pago Completado!</h1>
+        <p>Tu viaje ha sido confirmado exitosamente. Hemos enviado los detalles y billetes a tu correo electrónico.</p>
+
+        {% if booking_ref %}
+        <div class="pnr-box">
+            <span class="label">Tu Localizador de Reserva (PNR)</span>
+            <div class="pnr-code">{{ booking_ref }}</div>
+        </div>
+
+        <div class="instructions">
+            <h3>🛫 Cómo hacer el Check-in:</h3>
+            <ol>
+                <li>Visita la página web de la aerolínea operadora.</li>
+                <li>Busca la sección <strong>"Mis Viajes"</strong> o <strong>"Check-in"</strong>.</li>
+                <li>Introduce tu Localizador (PNR) <strong>{{ booking_ref }}</strong> y tu apellido.</li>
+                <li>Sigue los pasos para obtener tu tarjeta de embarque.</li>
+            </ol>
+            <p style="font-size: 0.9rem; margin-top: 10px; color: #64748b;">
+                {% if checkin_date %}
+                <strong>Nota:</strong> El check-in para tu vuelo estará disponible a partir del <strong>{{ checkin_date
+                    }}</strong> (24h antes de la salida).
+                {% else %}
+                *El check-in suele abrir 24-48h antes del vuelo.
+                {% endif %}
+            </p>
+        </div>
+        {% else %}
+        <div
+            style="background: #fff7ed; padding: 15px; border-radius: 8px; border: 1px solid #fdba74; margin-bottom: 20px;">
+            <p style="margin:0; color: #c2410c;">Estamos generando tu localizador. Lo recibirás por email en unos
+                minutos.</p>
+        </div>
+        {% endif %}
+
+        <a href="/" class="btn">Volver al Inicio</a>
     </div>
+
 </body>
+
 </html>

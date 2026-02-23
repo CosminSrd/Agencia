@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='imagenes/logosintexto.png') }}">
+    <title>Contacto | Viatges Carcaixent</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,700;0,900;1,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+</head>
+
+<body>
+
+    <header class="main-header header-scrolled">
+        <div class="logo-container">
+            <a href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="Viatges Carcaixent"
+                    class="logo-premium">
+            </a>
+        </div>
+        <nav class="nav-menu">
+            <ul>
+                <li><a href="{{ url_for('home') }}" class="nav-link">Inicio</a></li>
+                <li><a href="{{ url_for('destinos') }}" class="nav-link">Destinos</a></li>
+                <li><a href="{{ url_for('cruceros') }}" class="nav-link">Cruceros</a></li>
+                <li><a href="{{ url_for('ofertas') }}" class="nav-link">Ofertas</a></li>
+                <li><a href="{{ url_for('checkin') }}" class="nav-link">Check-in</a></li>
+                <li><a href="{{ url_for('contacto') }}" class="nav-link active">Contacto</a></li>
+            </ul>
+        </nav>
+        <a href="{{ url_for('presupuesto') }}" class="btn-presupuesto">PEDIR PRESUPUESTO</a>
+    </header>
+
+    <section class="contact-wrapper">
+        <div class="container-premium">
+            <div class="contact-flex-layout">
+
+                <aside class="boutique-info" data-aos="fade-right">
+                    <div class="office-visual">
+                        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1000"
+                            alt="Oficina HQ">
+                        <div class="visual-label">CARCAIXENT HQ</div>
+                    </div>
+
+                    <div class="contact-details-luxe">
+                        <div class="detail-item">
+                            <small>UBICACIÓN</small>
+                            <p>Calle Mayor, 12, Carcaixent</p>
+                            <a href="#" class="btn-map-link">
+                                <span>VER EN GOOGLE MAPS</span>
+                                <div class="line-effect"></div>
+                            </a>
+                        </div>
+                        <div class="detail-item">
+                            <small>CANAL DIRECTO</small>
+                            <p>+34 961 234 567</p>
+                            <a href="#" class="btn-whatsapp-priority">
+                                <span class="pulse-icon"></span>
+                                <i class="fab fa-whatsapp"></i>
+                                <span>WHATSAPP PRIORITARIO</span>
+                            </a>
+                        </div>
+                    </div>
+                </aside>
+
+                <div class="briefing-form-container" data-aos="fade-left">
+                    <div class="paper-effect">
+                        <div class="form-title">
+                            <h2>The Briefing</h2>
+                            <p>Rellena los detalles para que Andrea prepare una propuesta a medida.</p>
+                        </div>
+
+                        <form class="briefing-form">
+                            <div class="input-row">
+                                <div class="floating-group">
+                                    <input type="text" id="name" required placeholder=" ">
+                                    <label for="name">NOMBRE COMPLETO</label>
+                                </div>
+                                <div class="floating-group">
+                                    <input type="email" id="email" required placeholder=" ">
+                                    <label for="email">EMAIL DE CONTACTO</label>
+                                </div>
+                            </div>
+
+                            <div class="floating-group">
+                                <input type="text" id="destino" placeholder=" ">
+                                <label for="destino">DESTINO SOÑADO</label>
+                            </div>
+
+                            <div class="form-options">
+                                <p class="option-label">TIPO DE EXPERIENCIA:</p>
+                                <div class="pills-container">
+                                    <label class="pill">
+                                        <input type="radio" name="tipo" value="crucero">
+                                        <span>Crucero</span>
+                                    </label>
+                                    <label class="pill">
+                                        <input type="radio" name="tipo" value="lujo" checked>
+                                        <span>Gran Viaje</span>
+                                    </label>
+                                    <label class="pill">
+                                        <input type="radio" name="tipo" value="escapada">
+                                        <span>Escapada VIP</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="floating-group">
+                                <textarea id="msg" rows="4" placeholder=" "></textarea>
+                                <label for="msg">NOTAS PARA ANDREA...</label>
+                            </div>
+
+                            <button type="submit" class="btn-send-briefing">
+                                <span class="txt">ENVIAR SOLICITUD</span>
+                                <span class="icon"><i class="fas fa-paper-plane"></i></span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="contact-map" data-aos="zoom-in">
+        <div id="map">
+            <div class="map-overlay">
+                <span>CÓMO LLEGAR</span>
+            </div>
+            <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12365.111!2d-0.45!3d39.12!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd6196...!2sCarcaixent!5e0!3m2!1ses!2ses!4v1700000000000"
+                width="100%" height="450" style="border:0; filter: grayscale(1) invert(0.9);" allowfullscreen=""
+                loading="lazy"></iframe>
+        </div>
+    </section>
+    </main>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="{{ url_for('static', filename='style/script.js') }}"></script>
+</body>
+
+</html>

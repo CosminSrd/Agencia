@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='imagenes/logosintexto.png') }}">
+    <title>Check-in Online | Viatges Carcaixent</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #6366f1;
+            --surface: #ffffff;
+            --text-main: #1e293b;
+            --text-light: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-image: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.7)),
+            url("{{ url_for('static', filename='imagenes/heroinicio.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Allow scroll if needed on small screens */
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Reusing global header styles, just adding specific adjustment for this page context if needed */
+        .main-header {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: relative;
+            /* Override sticky for this page if needed, but keeping it relative to flow */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-content-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 40px 20px;
+        }
+
+        .card {
+            background: var(--surface);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative top bar */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #6366f1, #a855f7);
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.2s;
+            box-sizing: border-box;
+            background: #f8fafc;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+
+        .error {
+            background: #fef2f2;
+            color: #b91c1c;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+            text-align: center;
+            border: 1px solid #fecaca;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Result Styles */
+        .result-box {
+            background: #f0fdf4;
+            border: 2px dashed #86efac;
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .pnr-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #15803d;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .pnr-code {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.95rem;
+        }
+
+        .info-label {
+            color: #166534;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-weight: 700;
+            color: #14532d;
+        }
+
+        .instructions-box {
+            margin-top: 30px;
+            text-align: left;
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .instructions-list {
+            padding-left: 20px;
+            margin: 0;
+            color: #475569;
+            font-size: 0.95rem;
+        }
+
+        .instructions-list li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-main);
+            border: 2px solid #e2e8f0;
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            box-sizing: border-box;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn-secondary:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+            color: var(--primary);
+        }
+
+        /* Identity Collection Section */
+        .identity-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .identity-title {
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+        }
+
+        .passenger-row {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .passenger-name {
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .id-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .id-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .pnr-code {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="main-header" id="top">
+        <div class="logo-container">
+            <a href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="Viatges Carcaixent"
+                    class="logo-premium">
+            </a>
+        </div>
+        <nav class="nav-menu">
+            <ul>
+                <li><a href="{{ url_for('home') }}" class="nav-link">Inicio</a></li>
+                <li><a href="{{ url_for('destinos') }}" class="nav-link">Destinos</a></li>
+                <li><a href="{{ url_for('cruceros') }}" class="nav-link">Cruceros</a></li>
+                <li><a href="{{ url_for('ofertas') }}" class="nav-link">Ofertas</a></li>
+                <li><a href="{{ url_for('checkin') }}" class="nav-link active">Check-in</a></li>
+                <li><a href="{{ url_for('contacto') }}" class="nav-link">Contacto</a></li>
+            </ul>
+        </nav>
+        <a href="{{ url_for('presupuesto') }}" class="btn-presupuesto">PEDIR PRESUPUESTO</a>
+    </header>
+
+    <div class="main-content-wrapper">
+        <div class="card">
+            <h1>Gestión de Check-in</h1>
+
+            {% if error %}
+            <div class="error">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                {{ error }}
+            </div>
+            {% endif %}
+
+            {% if booking_ref %}
+            <!-- Result State -->
+            <div style="text-align: center;">
+                <p class="subtitle">Datos confirmados. Utiliza esta información para obtener tu tarjeta de embarque.</p>
+
+                <div class="result-box">
+                    <span class="pnr-label">Tu Localizador de Reserva</span>
+                    <div class="pnr-code">{{ booking_ref }}</div>
+
+                    {% if checkin_date %}
+                    <div class="info-row">
+                        <span class="info-label">Apertura Online:</span>
+                        <span class="info-value">{{ checkin_date }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if checkin_url %}
+                    <div style="margin-top: 14px;">
+                        <a href="{{ checkin_url }}" target="_blank" rel="noopener" class="btn" style="display:inline-block; text-decoration:none;">
+                            Ir al check-in de la aerolínea
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- NEW: Identity Document Collection -->
+                <div class="identity-box">
+                    <div class="identity-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        Datos para Auto-Checkin
+                    </div>
+                    <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">
+                        Completa tus datos ahora y te avisaremos automáticamente cuando se abra el plazo de check-in.
+                    </p>
+
+                    <form action="/api/vuelos/save-identity" method="POST" id="auto-checkin-form">
+                        <input type="hidden" name="codigo_reserva" value="{{ codigo_reserva }}">
+
+                        {% for p in pasajeros %}
+                        <div class="passenger-row">
+                            <span class="passenger-name">Pasajero: {{ p.given_name }} {{ p.family_name }}</span>
+                            <input type="hidden" name="passenger_duffel_id_{{ p.ui_id }}" value="{{ p.duffel_id or '' }}">
+                            <div class="id-form-grid">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 0.75rem;">Tipo Documento</label>
+                                    <select name="doc_type_{{ p.ui_id }}"
+                                        style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+                                        <option value="passport">Pasaporte</option>
+                                        <option value="id_card">DNI / Tarjeta Residencia</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 0.75rem;">Número Documento</label>
+                                    <input type="text" name="doc_number_{{ p.ui_id }}" placeholder="ABC12345" required
+                                        style="padding:8px; font-size: 0.9rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 0.75rem;">Caducidad</label>
+                                    <input type="date" name="doc_expiry_{{ p.ui_id }}" required
+                                        style="padding:8px; font-size: 0.9rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 0.75rem;">País Emisión</label>
+                                    <input type="text" name="doc_country_{{ p.ui_id }}" placeholder="ES" maxlength="2"
+                                        required style="padding:8px; font-size: 0.9rem; text-transform: uppercase;">
+                                </div>
+                            </div>
+                            {% if not p.can_update_identity %}
+                            <p style="font-size: 0.8rem; color: #b45309; margin-top: 8px;">
+                                ⚠️ Este pasajero no tiene ID de Duffel vinculado. Contacta soporte para completar auto-checkin.
+                            </p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        <button type="submit" class="btn" style="padding:12px; font-size: 0.95rem;">Guardar Datos y
+                            Activar Auto-Checkin</button>
+                    </form>
+                </div>
+
+                <div class="instructions-box">
+                    <h4 style="margin: 0 0 12px 0; color: var(--primary); font-size: 1rem;">Pasos a seguir:</h4>
+                    <ol class="instructions-list">
+                        <li>Accede a la web oficial de la aerolínea operadora.</li>
+                        <li>Busca el apartado <strong>"Check-in"</strong> o "Mis Viajes".</li>
+                        <li>Introduce el localizador <strong>{{ booking_ref }}</strong> y el apellido del pasajero
+                            principal.</li>
+                    </ol>
+                </div>
+
+                <a href="{{ url_for('checkin') }}" class="btn-secondary">Consultar otra reserva</a>
+            </div>
+            {% else %}
+            <!-- Form State -->
+            <p class="subtitle">Consulta el estado de tu reserva y obtén los códigos necesarios para tu vuelo.</p>
+
+            <form action="{{ url_for('checkin') }}" method="POST">
+                <div class="form-group">
+                    <label for="codigo_reserva">Código de Reserva</label>
+                    <input type="text" id="codigo_reserva" name="codigo_reserva" placeholder="Ej. FL1234AB" required
+                        style="text-transform: uppercase; letter-spacing: 1px;">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email de Compra</label>
+                    <input type="email" id="email" name="email" placeholder="ejemplo@email.com" required>
+                </div>
+
+                <button type="submit" class="btn">Buscar Reserva</button>
+
+                <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 15px; margin-bottom: 0;">
+                    *El código de reserva (FL...) lo recibiste en tu email de confirmación de pago.
+                </p>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+
+</html>

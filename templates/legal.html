@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='imagenes/logosintexto.png') }}">
+    <title>Aviso Legal y Privacidad | Viatges Carcaixent</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+    <style>
+        /* Estilos específicos para texto legal */
+        .legal-container {
+            max-width: 800px;
+            margin: 120px auto 60px auto;
+            /* Margen superior para salvar el header fijo */
+            padding: 40px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .legal-content h1 {
+            font-size: 2.5rem;
+            color: #1e293b;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #6366f1;
+            padding-bottom: 10px;
+        }
+
+        .legal-content h2 {
+            font-size: 1.5rem;
+            color: #1e3a8a;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .legal-content p {
+            color: #475569;
+            line-height: 1.7;
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .legal-content ul {
+            margin-left: 20px;
+            color: #475569;
+            line-height: 1.7;
+        }
+
+        .legal-content li {
+            margin-bottom: 10px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #6366f1;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="main-header" id="top">
+        <div class="logo-container">
+            <a href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="Viatges Carcaixent"
+                    class="logo-premium">
+            </a>
+        </div>
+        <nav class="nav-menu">
+            <ul>
+                <li><a href="{{ url_for('home') }}" class="nav-link">Inicio</a></li>
+                <li><a href="#" class="nav-link">Destinos</a></li>
+                <li><a href="#" class="nav-link">Cruceros</a></li>
+                <li><a href="#" class="nav-link">Ofertas</a></li>
+                <li><a href="{{ url_for('checkin') }}" class="nav-link">Check-in</a></li>
+                <li><a href="#" class="nav-link">Contacto</a></li>
+            </ul>
+        </nav>
+        <a href="{{ url_for('presupuesto') }}" class="btn-presupuesto">PEDIR PRESUPUESTO</a>
+    </header>
+
+    <div class="legal-container">
+        <a href="{{ url_for('home') }}" class="back-link">← Volver al inicio</a>
+
+        <div class="legal-content">
+            <h1>Términos Legales y Privacidad</h1>
+
+            <p>En cumplimiento de lo establecido en la normativa vigente sobre Protección de Datos de Carácter Personal,
+                le informamos que sus datos serán tratados en calidad de Responsable por <strong>Viatges
+                    Carcaixent</strong> con la finalidad de gestionar su reserva.</p>
+
+            <h2>1. Identificación del Responsable</h2>
+            <p><strong>Razón Social:</strong> Viatges Carcaixent S.L.<br>
+                <strong>Domicilio:</strong> Calle Mayor, Carcaixent (Valencia)<br>
+                <strong>Email:</strong> info@viatgescarcaixent.com
+            </p>
+
+            <h2>2. Política de Privacidad (GDPR)</h2>
+            <p>Los datos personales proporcionados (Nombre, DNI, Pasaporte, Fecha de nacimiento) son estrictamente
+                necesarios para la emisión de los billetes aéreos y la contratación de seguros de viaje. Estos datos
+                serán cedidos únicamente a los proveedores finales del servicio (Aerolíneas, Mayoristas de viajes y
+                Aseguradoras) tal y como exige la ley de transporte internacional.</p>
+
+            <h2>3. Condiciones de Compra</h2>
+            <ul>
+                <li><strong>Emisión de Billetes:</strong> Una vez realizado el pago, la emisión de los billetes es
+                    inmediata.</li>
+                <li><strong>Cambios y Cancelaciones:</strong> Las tarifas mostradas, salvo que se especifique lo
+                    contrario o se contrate el "Seguro Premium", suelen ser no reembolsables por parte de la aerolínea.
+                </li>
+                <li><strong>Documentación:</strong> Es responsabilidad exclusiva del pasajero tener el DNI o Pasaporte
+                    en vigor, así como los visados necesarios para el país de destino.</li>
+            </ul>
+
+            <h2>4. Seguros de Viaje</h2>
+            <p>Al seleccionar un seguro de viaje durante el proceso de compra, el cliente acepta las condiciones
+                generales de la póliza de la aseguradora colaboradora (ej. InterMundial o AON). Viatges Carcaixent actúa
+                como intermediario en la contratación.</p>
+
+            <ul>
+                <li><strong>Sin Seguro:</strong> El viajero asume todos los gastos derivados de incidencias,
+                    cancelaciones o problemas médicos.</li>
+                <li><strong>Seguro Básico:</strong> Incluye asistencia médica hasta 10.000€ y repatriación.</li>
+                <li><strong>Seguro Premium:</strong> Incluye gastos médicos ilimitados, cancelación por causas
+                    justificadas y pérdida de equipaje.</li>
+            </ul>
+
+            <h2>5. Legislación Aplicable</h2>
+            <p>Las presentes condiciones se regirán por la legislación española. Para cualquier litigio derivado de la
+                existencia o contenido de estas condiciones, ambas partes se someten a los Juzgados y Tribunales de
+                Valencia.</p>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-info">
+                <a href="{{ url_for('home') }}">
+                    <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="Viatges Carcaixent"
+                        class="footer-logo">
+                </a>
+                <p>Tu agencia de confianza en Carcaixent. Diseñamos experiencias, no solo viajes.</p>
+            </div>
+            <div class="footer-links">
+                <h4>EXPLORA</h4>
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Inicio</a></li>
+                    <li><a href="#">Destinos</a></li>
+                    <li><a href="#">Cruceros</a></li>
+                    <li><a href="#">Ofertas</a></li>
+                </ul>
+            </div>
+            <div class="footer-contact">
+                <h4>CONTACTO</h4>
+                <p class="contact-item">Calle Mayor, Carcaixent</p>
+                <p class="contact-item">info@viatgescarcaixent.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Viatges Carcaixent - Todos los derechos reservados.</p>
+            <p class="rsw-signature">Crafted by <span>RSW Studio</span></p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Gestión de Reserva | Viatges Carcaixent</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #6366f1;
+            --surface: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .login-card {
+            background: var(--surface);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .login-card h2 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--primary);
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            box-sizing: border-box;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .error {
+            color: #ef4444;
+            background: #fef2f2;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            border: 1px solid #fecaca;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-card">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="{{ url_for('static', filename='imagenes/logo.png') }}" style="height: 40px;">
+        </div>
+        <h2>Gestionar mi Viaje</h2>
+        <p style="text-align: center; color: #64748b; margin-bottom: 30px;">Accede para añadir equipaje, elegir asientos
+            o modificar tu reserva.</p>
+
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form action="{{ url_for('manage_booking_portal') }}" method="POST">
+            <div class="form-group">
+                <label>Número de Reserva (FL...)</label>
+                <input type="text" name="codigo" placeholder="Ej: FL6789XY" required style="text-transform: uppercase;">
+            </div>
+            <div class="form-group">
+                <label>Email de Reserva</label>
+                <input type="email" name="email" placeholder="tu@email.com" required>
+            </div>
+            <button type="submit" class="btn">Acceder al Portal</button>
+        </form>
+
+        <p style="text-align: center; margin-top: 25px; font-size: 0.85rem; color: #94a3b8;">
+            <a href="{{ url_for('home') }}" style="color: var(--accent); text-decoration: none;">← Volver al inicio</a>
+        </p>
+    </div>
+</body>
+
+</html>

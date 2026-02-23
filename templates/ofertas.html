@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='imagenes/logosintexto.png') }}">
+    <title>Ofertas Exclusivas | Viatges Carcaixent</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,700;0,900;1,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+</head>
+
+<body>
+
+    <header class="main-header" id="top">
+        <div class="logo-container">
+            <a href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="Viatges Carcaixent"
+                    class="logo-premium">
+            </a>
+        </div>
+        <nav class="nav-menu">
+            <ul>
+                <li><a href="{{ url_for('home') }}" class="nav-link">Inicio</a></li>
+                <li><a href="{{ url_for('destinos') }}" class="nav-link">Destinos</a></li>
+                <li><a href="{{ url_for('cruceros') }}" class="nav-link">Cruceros</a></li>
+                <li><a href="{{ url_for('ofertas') }}" class="nav-link active">Ofertas</a></li>
+                <li><a href="{{ url_for('checkin') }}" class="nav-link">Check-in</a></li>
+                <li><a href="{{ url_for('contacto') }}" class="nav-link">Contacto</a></li>
+            </ul>
+        </nav>
+        <a href="{{ url_for('presupuesto') }}" class="btn-presupuesto">PEDIR PRESUPUESTO</a>
+    </header>
+
+    <section class="hero-canvas-ofertas">
+        <div class="canvas-bg-text">OFERTAS</div>
+
+        <div class="canvas-container">
+            <div class="canvas-content">
+                <div class="canvas-header" data-aos="fade-down">
+                    <span class="luxe-label">EXCLUSIVIDAD GARANTIZADA</span>
+                    <h1 class="masked-title">LUJO <br><span>ACCESIBLE</span></h1>
+                </div>
+
+                <div class="canvas-body" data-aos="fade-right" data-aos-delay="200">
+                    <div class="editorial-line"></div>
+                    <p>Andrea selecciona. Tú disfrutas. <br> Una curaduría de experiencias con tarifas negociadas que
+                        desafían lo convencional.</p>
+
+                    <div class="canvas-actions">
+                        <a href="#grid-ofertas" class="btn-canvas-primary">
+                            DESCUBRIR SELECCIÓN
+                            <svg width="24" height="24" viewBox="0 0 24 24">
+                                <path
+                                    d="M13.025 1l-2.847 2.828 6.176 6.172h-16.354v4h16.354l-6.176 6.172 2.847 2.828 10.975-11z" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="canvas-gallery">
+                <div class="gallery-item item-main" data-aos="clip-left">
+                    <img src="https://images.unsplash.com/photo-1544918877-460635b6d13e?q=80&w=1000" alt="Viaje Lujo">
+                    <div class="img-overlay-text">DESTINO TOP</div>
+                </div>
+                <div class="gallery-item item-secondary" data-aos="fade-up" data-aos-delay="500">
+                    <div class="gold-inner-frame"></div>
+                    <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=800" alt="Resort">
+                </div>
+                <div class="floating-offer-info" data-aos="zoom-in" data-aos-delay="800">
+                    <span class="amount">-40%</span>
+                    <span class="txt">ÚLTIMAS<br>PLAZAS</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="side-scroll-info">
+            <span>SCROLL PARA EXPLORAR</span>
+            <div class="line"></div>
+        </div>
+    </section>
+
+    <section class="flash-deals-v5">
+        <div class="container-premium">
+            <div class="flash-header" data-aos="fade-up">
+                <div class="title-wrap">
+                    <span class="gold-subtitle">EDICIONES LIMITADAS</span>
+                    <h2>Selección <span>Flash</span></h2>
+                </div>
+                <p class="flash-intro">Tarifas negociadas con fecha de caducidad. <br>Cuando el contador llegue a cero,
+                    la oferta desaparece.</p>
+            </div>
+
+            <div class="flash-grid">
+                <article class="deal-card-luxe" data-aos="fade-up">
+                    <div class="card-image-box">
+                        <img src="https://images.unsplash.com/photo-1548574505-5e239809ee19?q=80&w=800" alt="Crucero">
+                        <div class="timer-overlay">
+                            <span class="time-item">02<small>D</small></span>
+                            <span class="time-sep">:</span>
+                            <span class="time-item">14<small>H</small></span>
+                        </div>
+                        <div class="card-price-tag">-400€</div>
+                    </div>
+                    <div class="card-info-luxe">
+                        <span class="card-cat">CRUCERO EXCLUSIVO</span>
+                        <h3>Fiordos Mágicos: <br><span class="editorial-italic">Ruta del Sol de Medianoche</span></h3>
+                        <div class="card-details">
+                            <span><i class="far fa-clock"></i> 8 Días</span>
+                            <span><i class="fas fa-ship"></i> MSC Euribia</span>
+                        </div>
+                        <div class="card-pricing">
+                            <span class="old-p">1.390€</span>
+                            <span class="new-p">990€</span>
+                        </div>
+                        <a href="{{ url_for('contacto') }}" class="btn-card-luxe">RESERVAR PLAZA <i
+                                class="fas fa-chevron-right"></i></a>
+                    </div>
+                </article>
+
+                <article class="deal-card-luxe offset-top" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card-image-box">
+                        <img src="https://images.unsplash.com/photo-1503917988258-f87a78e3c995?q=80&w=800" alt="Paris">
+                        <div class="timer-overlay urgent">
+                            <span>¡ÚLTIMO DÍA!</span>
+                        </div>
+                    </div>
+                    <div class="card-info-luxe">
+                        <span class="card-cat">ESCAPADA BOUTIQUE</span>
+                        <h3>París: <br><span class="editorial-italic">Le Marais Experience</span></h3>
+                        <div class="card-details">
+                            <span><i class="far fa-calendar"></i> Marzo</span>
+                            <span><i class="fas fa-hotel"></i> 5★ Luxe</span>
+                        </div>
+                        <div class="card-pricing">
+                            <span class="old-p">850€</span>
+                            <span class="new-p">520€</span>
+                        </div>
+                        <a href="{{ url_for('contacto') }}" class="btn-card-luxe">LO QUIERO <i
+                                class="fas fa-chevron-right"></i></a>
+                    </div>
+                </article>
+
+                <article class="deal-card-luxe" data-aos="fade-up" data-aos-delay="400">
+                    <div class="card-image-box">
+                        <img src="https://images.unsplash.com/photo-1506461883276-594a12b11cf3?q=80&w=800" alt="Safari">
+                        <div class="timer-overlay">
+                            <span>PLAZAS: 04</span>
+                        </div>
+                    </div>
+                    <div class="card-info-luxe">
+                        <span class="card-cat">GRANDES VIAJES</span>
+                        <h3>Safari Kenia: <br><span class="editorial-italic">Memorias de África VIP</span></h3>
+                        <div class="card-details">
+                            <span><i class="fas fa-plane"></i> Vuelos Inc.</span>
+                            <span><i class="fas fa-gem"></i> Todo Lujo</span>
+                        </div>
+                        <div class="card-pricing">
+                            <span class="old-p">3.100€</span>
+                            <span class="new-p">2.390€</span>
+                        </div>
+                        <a href="{{ url_for('contacto') }}" class="btn-card-luxe">DETALLES <i
+                                class="fas fa-chevron-right"></i></a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="vip-collection">
+        <div class="container-premium">
+            <div class="vip-intro" data-aos="fade-up">
+                <span class="gold-tag">ACCESO RESTRINGIDO</span>
+                <h2>La Colección de <span>Andrea</span></h2>
+                <p>Viajes que no se publican en catálogos. Plazas reservadas para clientes que buscan lo extraordinario.
+                </p>
+            </div>
+
+            <div class="bento-grid">
+                <div class="bento-item main-bento" data-aos="zoom-in">
+                    <div class="bento-img">
+                        <img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?q=80&w=1000"
+                            alt="Maldivas">
+                        <div class="bento-overlay">
+                            <div class="bento-content">
+                                <span class="bento-cat">ISLAS PRIVADAS</span>
+                                <h3>Maldivas: <span class="editorial-italic">El Refugio Celeste</span></h3>
+                                <p>Villa sobre el agua con piscina privada y cena bajo las estrellas incluida.</p>
+                                <a href="{{ url_for('contacto') }}" class="btn-bento">SOLICITAR DOSSIER</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bento-item tall-bento" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="bento-img">
+                        <img src="{{ url_for('static', filename='imagenes/rutasakura.webp') }}" alt="Japón">
+                        <div class="bento-overlay">
+                            <div class="bento-content">
+                                <span class="bento-cat">CULTURA VIP</span>
+                                <h3>Japón: <span class="editorial-italic">Ruta del Sakura</span></h3>
+                                <div class="bento-price-label">DESDE 4.200€</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bento-item small-bento" data-aos="zoom-in" data-aos-delay="400">
+                    <div class="bento-img">
+                        <img src="https://images.unsplash.com/photo-1510798831971-661eb04b3739?q=80&w=600"
+                            alt="Auroras">
+                        <div class="bento-overlay">
+                            <div class="bento-content">
+                                <span class="bento-cat">AVENTURA</span>
+                                <h4>Laponia Íntima</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bento-item small-bento" data-aos="zoom-in" data-aos-delay="600">
+                    <div class="bento-img">
+                        <img src="{{ url_for('static', filename='imagenes/yate.jpg') }}" alt="Yate">
+                        <div class="bento-overlay">
+                            <div class="bento-content">
+                                <span class="bento-cat">NAVEGACIÓN</span>
+                                <h4>Yate Privado Ibiza</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cierre-ofertas">
+        <div class="container-premium">
+            <div class="garantia-autor" data-aos="fade-up">
+                <div class="garantia-icon">
+                    <i class="fas fa-award"></i>
+                </div>
+                <div class="garantia-text">
+                    <h3>Por qué confiar en nuestras <span>selecciones</span></h3>
+                    <p>Cada oferta que ves aquí ha sido filtrada personalmente por Andrea. No publicamos nada que no
+                        reservaríamos para nosotros mismos. Gestión de incidencias 24/7 y sin letra pequeña.</p>
+                </div>
+            </div>
+
+            <div class="newsletter-luxe" data-aos="zoom-in">
+                <div class="news-content">
+                    <span class="gold-subtitle">SÉ EL PRIMERO EN SABERLO</span>
+                    <h2>Únete a la Lista <br><span class="editorial-italic">Prioritaria</span></h2>
+                    <p>Las ofertas más agresivas se agotan en menos de 2h y nunca llegan a publicarse aquí. Recíbelas
+                        directamente en tu email o WhatsApp.</p>
+
+                    <form class="news-form">
+                        <div class="input-group-luxe">
+                            <input type="text" placeholder="Tu nombre" required>
+                        </div>
+                        <div class="input-group-luxe">
+                            <input type="email" placeholder="Tu mejor email" required>
+                        </div>
+                        <button type="submit" class="btn-news-submit">
+                            SOLICITAR ACCESO <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                    <p class="privacy-note">Respetamos tu privacidad. Solo contenido exclusivo, cero spam.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="concierge-bridge">
+        <div class="bridge-container">
+            <div class="bridge-content" data-aos="fade-up">
+                <div class="bridge-text">
+                    <span class="luxe-tag">¿BUSCAS ALGO ESPECÍFICO?</span>
+                    <h2>Tu oferta personalizada <br><span class="editorial-italic">está a un clic.</span></h2>
+                    <p>Nuestras mejores tarifas a veces duran minutos. Si tienes un destino en mente, dínoslo y
+                        activaremos nuestro radar de oportunidades para ti.</p>
+                </div>
+
+                <div class="bridge-cta">
+                    <a href="{{ url_for('contacto') }}" class="btn-bridge-main">
+                        <span class="btn-text">PLANIFICAR MI VIAJE</span>
+                        <span class="btn-icon"><i class="fas fa-arrow-right"></i></span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="trust-logos" data-aos="fade-in" data-aos-delay="300">
+                <span>COLABORADORES PREMIUM:</span>
+                <div class="logo-strip">
+                    <img src="{{ url_for('static', filename='imagenes/msc-cruises-1.svg') }}" alt="MSC">
+                    <img src="{{ url_for('static', filename='imagenes/royal-caribbean-logo-1.svg') }}" alt="Royal">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-info">
+                <a href="{{ url_for('home') }}">
+                    <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="Viatges Carcaixent"
+                        class="footer-logo">
+                </a>
+                <p>Tu agencia de confianza en Carcaixent. Diseñamos experiencias, no solo viajes.</p>
+            </div>
+
+            <div class="footer-links">
+                <h4>EXPLORA</h4>
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Inicio</a></li>
+                    <li><a href="{{ url_for('destinos') }}">Destinos</a></li>
+                    <li><a href="{{ url_for('cruceros') }}">Cruceros</a></li>
+                    <li><a href="{{ url_for('ofertas') }}">Ofertas</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-contact">
+                <h4>CONTACTO</h4>
+                <p class="contact-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="footer-icon">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    Calle Mayor, Carcaixent
+                </p>
+                <p class="contact-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="footer-icon">
+                        <path
+                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l2.27-2.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                        </path>
+                    </svg>
+                    +34 000 000 000
+                </p>
+                <p class="contact-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="footer-icon">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    info@viatgescarcaixent.com
+                </p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Viatges Carcaixent - Todos los derechos reservados.</p>
+            <p class="rsw-signature">Crafted by <span>RSW Studio</span></p>
+        </div>
+    </footer>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="{{ url_for('static', filename='style/script.js') }}"></script>
+
+</body>
+
+</html>

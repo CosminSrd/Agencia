@@ -1,0 +1,29 @@
+/* ============================================ */
+/* ESTILOS ADICIONALES PARA INDEX.HTML */
+/* ============================================ */
+
+/* Botón "Ver Todos los Destinos" */
+.btn-ver-todos-destinos {
+    display: inline-block;
+    background: linear-gradient(135deg, #D4AF37, #B8860B);
+    color: white;
+    padding: 18px 40px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3);
+    letter-spacing: 0.5px;
+}
+
+.btn-ver-todos-destinos:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
+    background: linear-gradient(135deg, #B8860B, #D4AF37);
+}
+
+/* Asegurar que las cards dinámicas sean clickables */
+#destinos-destacados .card-reveal {
+    cursor: pointer;
+}

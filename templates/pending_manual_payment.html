@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva Confirmada - Pendiente de Pago</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .card {
+            max-width: 760px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+
+        .ok {
+            color: #047857;
+            font-weight: 700;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 8px 0;
+        }
+
+        .bank {
+            margin-top: 20px;
+            background: #f1f5f9;
+            border-left: 4px solid #6366f1;
+            padding: 14px;
+            border-radius: 8px;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 18px;
+            padding: 10px 16px;
+            background: #1e293b;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>Reserva registrada</h1>
+        <p class="ok">✅ Estado actual: <strong>{{ reserva.estado }}</strong>.</p>
+
+        <div class="row"><span>Código de reserva</span><strong>{{ reserva.codigo_reserva }}</strong></div>
+        <div class="row"><span>Email cliente</span><strong>{{ reserva.email_cliente }}</strong></div>
+        <div class="row"><span>Total</span><strong>{{ reserva.precio_total }} EUR</strong></div>
+        <div class="row"><span>Origen</span><strong>{{ reserva.datos_vuelo.origen if reserva.datos_vuelo else '-' }}</strong></div>
+        <div class="row"><span>Destino</span><strong>{{ reserva.datos_vuelo.destino if reserva.datos_vuelo else '-' }}</strong></div>
+
+        <div class="bank">
+            <p><strong>Siguiente paso</strong></p>
+            <p>Beneficiario: Viatges Carcaixent</p>
+            <p>IBAN: ES00 0000 0000 0000 0000 0000</p>
+            <p>Concepto: {{ reserva.codigo_reserva }}</p>
+            <p>Cuando el pago esté confirmado, el equipo finalizará la emisión manual del billete.</p>
+        </div>
+
+        <a href="/" class="btn">Volver al inicio</a>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Seguro - Viatges Carcaixent</title>
+    <!-- Fuentes y Estilos -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Duffel SDK (Custom Element Version) -->
+    <script type="text/javascript" src="https://assets.duffel.com/components/3.11.0/duffel-card-form.js"></script>
+    <!-- Cookie Consent -->
+    <script src="/static/js/cookie-consent.js"></script>
+
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #6366f1;
+            --bg-light: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Minimalista */
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* Layout Principal */
+        .checkout-container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 40px;
+            flex: 1;
+        }
+
+        @media (max-width: 900px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panel Izquierdo: Resumen */
+        .summary-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+        }
+
+        .flight-route {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .iata {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .airport-name {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .arrow {
+            color: var(--text-light);
+        }
+
+        .flight-details {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .price-total {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--bg-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price-label {
+            font-weight: 600;
+        }
+
+        .price-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Panel Derecho: Pago */
+        .payment-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            /* Prevent double scrollbars */
+        }
+
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #ecfdf5;
+            color: var(--success);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            width: fit-content;
+        }
+
+        .pay-btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pay-btn:hover {
+            background: #1e293b;
+            transform: translateY(-1px);
+        }
+
+        .pay-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .error-msg {
+            color: #ef4444;
+            background: #fef2f2;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        /* Fix for Custom Element Mode - Increased Height and Flex */
+        duffel-card-form {
+            display: block;
+            width: 100%;
+            min-height: 800px;
+            /* Increased to avoid internal scrollbar */
+            flex-grow: 1;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="/" class="logo">Viatges Carcaixent</a>
+    </header>
+
+    {% if checkout_multi_step %}
+    <!-- FASE 6: Progress Indicator -->
+    <div class="checkout-progress">
+        <div class="progress-step active" id="step-indicator-1">
+            <div class="progress-step-circle">1</div>
+            <span class="progress-step-label">Revisar Datos</span>
+        </div>
+        <div class="progress-connector"></div>
+        <div class="progress-step" id="step-indicator-2">
+            <div class="progress-step-circle">2</div>
+            <span class="progress-step-label">Pago Seguro</span>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="checkout-container">
+        <!-- Resumen del Viaje (FASE 6: Sticky) -->
+        <div class="summary-card sticky">
+            <h3 style="margin-bottom: 20px;">Tu Viaje</h3>
+            {% set vuelo = reserva.datos_vuelo %}
+            <div class="flight-route">
+                <div>
+                    <div class="iata">{{ vuelo.origen }}</div>
+                    <div class="airport-name">Origen</div>
+                </div>
+                <div class="arrow"><i class="fa-solid fa-plane"></i></div>
+                <div>
+                    <div class="iata">{{ vuelo.destino }}</div>
+                    <div class="airport-name">Destino</div>
+                </div>
+            </div>
+
+            <div class="flight-details">
+                <div class="detail-row">
+                    <span>Fecha</span>
+                    <span style="font-weight:500; color:var(--text-main);">
+                        {% if vuelo.segmentos %}
+                        {{ vuelo.segmentos[0].fecha_salida }}
+                        {% elif vuelo.fecha_ida %}
+                        {{ vuelo.fecha_ida }}
+                        {% else %}
+                        {{ vuelo.fecha }}
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span>Pasajeros</span>
+                    <span style="font-weight:500; color:var(--text-main);">{{ reserva.pasajeros|length }}
+                        Pers.</span>
+                </div>
+                {% if (vuelo.get('precio_maletas', 0) | float) > 0 %}
+                <div class="detail-row">
+                    <span>🧳 Maletas Extra</span>
+                    <span style="font-weight:500; color:var(--text-main);">+{{ vuelo.get('precio_maletas', 0) }}€</span>
+                </div>
+                {% endif %}
+                {% if (vuelo.get('precio_seguro', 0) | float) > 0 %}
+                <div class="detail-row">
+                    <span>🛡️ Seguro</span>
+                    <span style="font-weight:500; color:var(--text-main);">+{{ vuelo.get('precio_seguro', 0) }}€</span>
+                </div>
+                {% endif %}
+                {% if (vuelo.get('precio_asientos', 0) | float) > 0 %}
+                <div class="detail-row">
+                    <span>💺 Asientos</span>
+                    <span style="font-weight:500; color:var(--text-main);">+{{ vuelo.get('precio_asientos', 0) }}€</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="price-total">
+                <span class="price-label">Total a Pagar</span>
+                <span class="price-value" id="total-display">{{ reserva.precio_total }}€</span>
+            </div>
+        </div>
+
+        {% if checkout_multi_step %}
+        <!-- FASE 6: Multi-Step Content -->
+        <div>
+            <!-- Step 1: Review Data -->
+            <div class="checkout-step active" id="checkout-step-1">
+                <div class="checkout-review-section">
+                    <h2 class="review-section-title">
+                        <i class="fa-solid fa-users"></i> Datos de Pasajeros
+                    </h2>
+                    <div id="review-passengers-list">
+                        {% for pasajero in reserva.pasajeros %}
+                        <div class="review-passenger-card">
+                            <h4 style="margin-bottom: 12px; color: #6366f1; font-weight: 700;">
+                                👤 Pasajero {{ loop.index }}
+                            </h4>
+                            <div class="review-data-row">
+                                <span class="review-data-label">Nombre completo:</span>
+                                <span class="review-data-value">{{ pasajero.nombre }} {{ pasajero.apellidos }}</span>
+                            </div>
+                            <div class="review-data-row">
+                                <span class="review-data-label">Documento:</span>
+                                <span class="review-data-value">{{ pasajero.documento }}</span>
+                            </div>
+                            <div class="review-data-row">
+                                <span class="review-data-label">Fecha de nacimiento:</span>
+                                <span class="review-data-value">{{ pasajero.fecha_nacimiento }}</span>
+                            </div>
+                            {% if pasajero.email %}
+                            <div class="review-data-row">
+                                <span class="review-data-label">Email:</span>
+                                <span class="review-data-value">{{ pasajero.email }}</span>
+                            </div>
+                            {% endif %}
+                            {% if pasajero.telefono %}
+                            <div class="review-data-row">
+                                <span class="review-data-label">Teléfono:</span>
+                                <span class="review-data-value">{{ pasajero.telefono }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0; display: flex; gap: 15px;">
+                        <button onclick="window.history.back()" class="btn-edit-data">
+                            <i class="fa-solid fa-arrow-left"></i> Volver a Buscar
+                        </button>
+                        <button onclick="avanzarAPago()" class="pay-btn" style="flex: 1; margin-top: 0;">
+                            Continuar al Pago <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Payment -->
+            <div class="checkout-step" id="checkout-step-2">
+                <div class="payment-card">
+            <div class="secure-badge">
+                <i class="fa-solid fa-lock"></i> Pago Seguro SSL
+            </div>
+
+            <h2 style="margin-bottom: 20px; font-weight:700;">Datos de Tarjeta</h2>
+
+            <!-- Duffel Custom Element with Locale -->
+            <duffel-card-form id="duffel-card-component" locale="es" lang="es"></duffel-card-form>
+
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button onclick="volverARevisar()" class="btn-edit-data" style="padding: 16px 24px;">
+                    <i class="fa-solid fa-arrow-left"></i> Volver
+                </button>
+                <button id="btn-pay" class="pay-btn" onclick="procesarPago()" style="flex: 1; margin-top: 0;">
+                    Pagar <span id="btn-total" style="margin-left: 5px;">{{ reserva.precio_total }}</span>€ <i
+                        class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <div id="error-message" class="error-msg"></div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="payment-card">
+            <div class="secure-badge">
+                <i class="fa-solid fa-lock"></i> Pago Seguro SSL
+            </div>
+
+            <h2 style="margin-bottom: 20px; font-weight:700;">Datos de Tarjeta</h2>
+
+            <!-- Duffel Custom Element with Locale -->
+            <duffel-card-form id="duffel-card-component" locale="es" lang="es"></duffel-card-form>
+
+            <button id="btn-pay" class="pay-btn" onclick="procesarPago()">
+                Pagar <span id="btn-total" style="margin-left: 5px;">{{ reserva.precio_total }}</span>€ <i
+                    class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <div id="error-message" class="error-msg"></div>
+        </div>
+        {% endif %}
+    </div>
+
+    <footer>
+        <div style="margin-bottom: 10px;">
+            <a href="/legal" target="_blank"
+                style="color: var(--text-light); text-decoration: none; margin-right: 15px;">Aviso Legal y
+                Privacidad</a>
+            <a href="/" style="color: var(--text-light); text-decoration: none;">Inicio</a>
+        </div>
+        &copy; 2026 Viatges Carcaixent. Todos los derechos reservados.
+    </footer>
+
+    <script>
+        const reservaId = "{{ reserva.id }}";
+        const codigoReserva = "{{ reserva.codigo_reserva }}";
+        const totalAmount = parseFloat("{{ reserva.precio_total }}");
+        const currency = "EUR";
+
+        const cardComponent = document.getElementById('duffel-card-component');
+        const btnPay = document.getElementById('btn-pay');
+        const errorDiv = document.getElementById('error-message');
+
+        async function initPayment() {
+            try {
+                // 1. Crear Payment Intent
+                console.log('💳 Creando Payment Intent...');
+                const resIntent = await fetch('/api/vuelos/payment-intent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: parseFloat(totalAmount).toFixed(2),
+                        currency: currency,
+                        reserva_id: reservaId
+                    })
+                });
+                const dataIntent = await resIntent.json();
+                if (dataIntent.manual_payment && dataIntent.redirect_url) {
+                    window.location.href = dataIntent.redirect_url;
+                    return;
+                }
+                if (!dataIntent.success) throw new Error(dataIntent.error || 'Error al inicializar el pago');
+
+                // 2. Obtener Client Component Key
+                console.log('🔑 Obteniendo Component Key...');
+                const resKey = await fetch('/api/vuelos/client-component-key', { method: 'POST' });
+                const dataKey = await resKey.json();
+                if (dataKey.manual_payment && dataKey.reason === 'unavailable_feature') {
+                    window.location.href = `/reserva/pendiente-pago/${codigoReserva}`;
+                    return;
+                }
+                if (!dataKey.success) throw new Error(dataKey.error || 'Error al obtener clave de componente');
+                if (!dataKey.client_key || String(dataKey.client_key).trim() === '') {
+                    throw new Error('La clave de componente Duffel está vacía');
+                }
+
+                // 3. Renderizar Componente
+                console.log('🎨 Renderizando Custom Element...');
+                if (cardComponent.render) {
+                    cardComponent.render({
+                        clientKey: dataKey.client_key,
+                        intent: 'to-create-card-for-temporary-use',
+                        // Intentamos pasar locale aquí, que es lo más probable
+                        locale: 'es',
+                        styles: {
+                            root: { fontFamily: 'Inter, sans-serif' }
+                        }
+                    });
+                } else {
+                    throw new Error("El componente de pago no está disponible. Por favor, recarga la página.");
+                }
+
+                // Listeners for Custom Element events
+                cardComponent.addEventListener('onCreateCardForTemporaryUseSuccess', onCardSuccess);
+                cardComponent.addEventListener('onCreateCardForTemporaryUseFailure', onCardFailure);
+
+            } catch (e) {
+                const mensaje = String(e && e.message ? e.message : e || '');
+                if (mensaje.includes('unavailable_feature') || mensaje.includes('Duffel Payments is not available')) {
+                    window.location.href = `/reserva/pendiente-pago/${codigoReserva}`;
+                    return;
+                }
+                showError("❌ Error al inicializar el pago: " + e.message + ". Por favor, intenta de nuevo o contacta con nuestro equipo.");
+                btnPay.disabled = true;
+            }
+        }
+
+        function procesarPago() {
+            btnPay.disabled = true;
+            btnPay.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Procesando...';
+            errorDiv.style.display = 'none';
+
+            if (cardComponent.createCardForTemporaryUse) {
+                cardComponent.createCardForTemporaryUse();
+            } else {
+                showError("Componente no listo");
+            }
+        }
+
+        async function onCardSuccess(e) {
+            console.log("✅ Tarjeta tokenizada:", e.detail.data.id);
+            const cardId = e.detail.data.id;
+
+            try {
+                const res = await fetch('/api/vuelos/confirmar-pago', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        reserva_id: reservaId,
+                        card_id: cardId,
+                        amount: totalAmount,
+                        currency: currency
+                    })
+                });
+
+                const data = await res.json();
+                if (data.manual_payment && data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                } else if (data.success) {
+                    window.location.href = '/success';
+                } else {
+                    throw new Error(data.error || 'Error desconocido al confirmar el pago');
+                }
+
+            } catch (err) {
+                showError("❌ Error al confirmar el cobro: " + err.message + ". Por favor, contacta con nosotros si el cargo aparece en tu banco.");
+                btnPay.disabled = false;
+                btnPay.innerHTML = 'Reintentar Pago <i class="fa-solid fa-arrow-right"></i>';
+            }
+        }
+
+        function onCardFailure(e) {
+            console.error("❌ Error tarjeta:", e.detail.error);
+            const errorMsg = e.detail.error.message || "Error desconocido";
+
+            // Log security event
+            console.warn("🚨 PAYMENT FAILURE - Security Event:", {
+                errorMsg: errorMsg,
+                reservaId: reservaId,
+                timestamp: new Date().toISOString()
+            });
+
+            // FASE 6: Mensajes de error mejorados en español
+            let userMessage = "";
+            
+            if (errorMsg.includes("unavailable") || errorMsg.includes("access to it") || errorMsg.includes("timeout")) {
+                userMessage = "⏱️ El servicio de pago no está disponible temporalmente. Intenta de nuevo en unos minutos o usa pago manual.";
+            } else if (errorMsg.includes("declined") || errorMsg.includes("rechazada")) {
+                userMessage = "❌ Tu tarjeta ha sido rechazada. Por favor:\n• Verifica que los datos sean correctos\n• Comprueba que tengas fondos suficientes\n• Contacta con tu banco si el problema persiste";
+            } else if (errorMsg.includes("expired") || errorMsg.includes("caducada")) {
+                userMessage = "⚠️ Tu tarjeta ha caducado. Por favor, utiliza otra tarjeta válida.";
+            } else if (errorMsg.includes("cvv") || errorMsg.includes("cvc") || errorMsg.includes("security code")) {
+                userMessage = "🔒 El código de seguridad (CVV/CVC) es incorrecto. Revisa los 3 dígitos en el reverso de tu tarjeta.";
+            } else if (errorMsg.includes("insufficient")) {
+                userMessage = "💳 Fondos insuficientes. Por favor, utiliza otra tarjeta o método de pago.";
+            } else {
+                userMessage = `❌ Error al procesar tu tarjeta: ${errorMsg}.\n\nPor favor, intenta:\n• Revisar los datos introducidos\n• Usar otra tarjeta\n• Contactar con nuestro equipo: info@viatgescarcaixent.com`;
+            }
+
+            showError(userMessage);
+            btnPay.disabled = false;
+            btnPay.innerHTML = 'Reintentar Pago ' + totalAmount + '€ <i class="fa-solid fa-arrow-right"></i>';
+        }
+
+        function showError(msg) {
+            errorDiv.innerText = msg;
+            errorDiv.style.display = 'block';
+        }
+
+        // FASE 6: Multi-step navigation
+        function avanzarAPago() {
+            const step1 = document.getElementById('checkout-step-1');
+            const step2 = document.getElementById('checkout-step-2');
+            const indicator1 = document.getElementById('step-indicator-1');
+            const indicator2 = document.getElementById('step-indicator-2');
+
+            if (!step1 || !step2 || !indicator1 || !indicator2) {
+                return;
+            }
+
+            // Ocultar step 1, mostrar step 2
+            step1.classList.remove('active');
+            step2.classList.add('active');
+            
+            // Actualizar indicadores de progreso
+            indicator1.classList.remove('active');
+            indicator1.classList.add('completed');
+            indicator1.querySelector('.progress-step-circle').classList.add('completed');
+            indicator1.querySelector('.progress-step-circle').textContent = '';
+            
+            indicator2.classList.add('active');
+            
+            // Scroll suave al inicio
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function volverARevisar() {
+            const step1 = document.getElementById('checkout-step-1');
+            const step2 = document.getElementById('checkout-step-2');
+            const indicator1 = document.getElementById('step-indicator-1');
+            const indicator2 = document.getElementById('step-indicator-2');
+
+            if (!step1 || !step2 || !indicator1 || !indicator2) {
+                return;
+            }
+
+            // Mostrar step 1, ocultar step 2
+            step2.classList.remove('active');
+            step1.classList.add('active');
+            
+            // Actualizar indicadores
+            indicator2.classList.remove('active');
+            indicator1.classList.remove('completed');
+            indicator1.classList.add('active');
+            indicator1.querySelector('.progress-step-circle').classList.remove('completed');
+            indicator1.querySelector('.progress-step-circle').textContent = '1';
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // FASE 6: Sticky summary behavior
+        function initStickySummary() {
+            const summaryCard = document.querySelector('.summary-card.sticky');
+            if (!summaryCard) return;
+
+            let lastScroll = 0;
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+                
+                if (currentScroll > 150) {
+                    summaryCard.classList.add('sticky-active');
+                } else {
+                    summaryCard.classList.remove('sticky-active');
+                }
+                
+                lastScroll = currentScroll;
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initPayment();
+            initStickySummary();
+        });
+    </script>
+
+</body>
+
+</html>

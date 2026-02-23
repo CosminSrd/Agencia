@@ -1,0 +1,163 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Gestión de Tours{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="header">
+        <h1 class="page-title">Gestión de Tours</h1>
+        <div class="user-info">
+            <div class="user-avatar">{{ current_user.username[0].upper() }}</div>
+            <span>{{ current_user.username }}</span>
+            <a href="/admin/logout" class="logout-btn">Salir</a>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h2 style="margin-bottom: 20px;">Todos los Tours</h2>
+        
+        {% if tours %}
+        <table class="data-table" style="width: 100%;">
+            <thead>
+                <tr style="background: #f5f5f5; border-bottom: 2px solid #667eea;">
+                    <th style="padding: 12px; text-align: left; font-weight: 600;">ID Tour</th>
+                    <th style="padding: 12px; text-align: left; font-weight: 600;">Nombre</th>
+                    <th style="padding: 12px; text-align: left; font-weight: 600;">Destino</th>
+                    <th style="padding: 12px; text-align: left; font-weight: 600;">Precio</th>
+                    <th style="padding: 12px; text-align: left; font-weight: 600;">Duración</th>
+                    <th style="padding: 12px; text-align: left; font-weight: 600;">Fecha Creación</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tour in tours %}
+                <tr style="border-bottom: 1px solid #ecf0f1;">
+                    <td style="padding: 12px;">
+                        <span style="color: #667eea; font-weight: 600;">{{ tour.id }}</span>
+                    </td>
+                    <td style="padding: 12px;">{{ tour.nombre or 'N/A' }}</td>
+                    <td style="padding: 12px;">
+                        <span style="background: #ecf0f1; padding: 4px 8px; border-radius: 4px;">
+                            {{ tour.destino or 'N/A' }}
+                        </span>
+                    </td>
+                    <td style="padding: 12px;">
+                        <span style="color: #27ae60; font-weight: 600;">
+                            €{{ "%.2f"|format(tour.precio) if tour.precio else 'N/A' }}
+                        </span>
+                    </td>
+                    <td style="padding: 12px;">
+                        {% if tour.duracion_dias %}
+                            {{ tour.duracion_dias }} días
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td style="padding: 12px; color: #7f8c8d; font-size: 13px;">
+                        {% if tour.fecha_creacion %}
+                            {{ tour.fecha_creacion.strftime('%d/%m/%Y') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="padding: 40px; text-align: center; color: #95a5a6;">
+            <p style="font-size: 16px;">🗺️ No hay tours registrados</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <a href="/admin/dashboard" class="btn btn-secondary" style="margin-top: 20px;">← Volver al Dashboard</a>
+</div>
+
+<style>
+    .content {
+        padding: 20px;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .page-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #667eea;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+    }
+
+    .logout-btn {
+        padding: 8px 16px;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .logout-btn:hover {
+        background: #c0392b;
+    }
+
+    .content-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+    }
+
+    .btn-secondary {
+        background: #ecf0f1;
+        color: #2c3e50;
+    }
+
+    .btn-secondary:hover {
+        background: #d5dbdb;
+    }
+</style>
+{% endblock %}

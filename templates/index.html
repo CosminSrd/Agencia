@@ -1,74 +1,2587 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <title>Reservas - Viajes Cosmin</title>
-    <style>
-        body { font-family: sans-serif; background: #f4f4f9; padding: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .card img { width: 100%; height: 200px; object-fit: cover; }
-        .content { padding: 20px; }
-        .price { font-size: 1.5rem; color: #27ae60; font-weight: bold; }
-        button { width: 100%; padding: 10px; background: #6772e5; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 500px; max-height:90vh; overflow-y:auto; }
-        .pax-item { background: #f8f9fa; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; }
-        input { width: 100%; padding: 8px; margin: 5px 0; box-sizing: border-box; }
-        .btn-add { background: #e8f5e9; color: #2e7d32; border: 1px dashed #2e7d32; margin-bottom: 10px; }
-        .close { background: #ccc; margin-top: 10px; color: black; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='imagenes/logosintexto.png') }}">
+    <title>Viatges Carcaixent | Tu próximo destino</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+    <!-- Duffel Components CDN (jsDelivr) -->
+    <!-- Duffel Components CDN (Official Asset) -->
+    <script src="https://assets.duffel.com/components/3.11.0/duffel-card-form.js"></script>
 </head>
+
 <body>
-    <h1 style="text-align:center;">✈️ Destinos</h1>
-    <div class="grid">
-        {% for viaje in viajes %}
-        <div class="card">
-            <img src="{{ viaje[4] }}">
-            <div class="content">
-                <h3>{{ viaje[1] }}</h3>
-                <p>{{ viaje[2] }}</p>
-                <p class="price">{{ viaje[3] }} €</p>
-                <button onclick="abrir('{{viaje[0]}}', '{{viaje[1]}}', {{viaje[3]}})">Reservar</button>
+    <div id="rsw-checkout" style="display:none;"></div>
+    <header class="main-header" id="top">
+        <div class="logo-container">
+            <a href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="Viatges Carcaixent"
+                    class="logo-premium">
+            </a>
+        </div>
+        <nav class="nav-menu">
+            <ul>
+                <li><a href="{{ url_for('home') }}" class="nav-link active">Inicio</a></li>
+                <li><a href="{{ url_for('destinos') }}" class="nav-link">Destinos</a></li>
+                <li><a href="{{ url_for('cruceros') }}" class="nav-link">Cruceros</a></li>
+                <li><a href="{{ url_for('ofertas') }}" class="nav-link">Ofertas</a></li>
+                <li><a href="{{ url_for('checkin') }}" class="nav-link">Check-in</a></li>
+                <li><a href="{{ url_for('contacto') }}" class="nav-link">Contacto</a></li>
+            </ul>
+        </nav>
+        <a href="{{ url_for('presupuesto') }}" class="btn-presupuesto">PEDIR PRESUPUESTO</a>
+    </header>
+
+    <section class="index-hero">
+        <div class="index-hero-bg"></div>
+        <div class="index-hero-overlay"></div>
+
+        <div class="index-hero-container">
+            <div class="index-hero-text">
+                <span class="index-hero-tag">DISEÑAMOS TUS SUEÑOS</span>
+                <h1>El mundo te espera. <br><span>Nosotros te llevamos.</span></h1>
+            </div>
+
+            <!-- Buscador simplificado sin pestanas -->
+            <div class="index-search-tabs" style="display:none;"></div>
+
+            <div class="index-search-wrapper">
+                <div id="simple-search-container">
+                    <div class="index-search-bar">
+
+                        <div class="index-search-item" style="position: relative;">
+                            <div class="index-search-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                            </div>
+                            <div class="index-search-info">
+                                <label>ORIGEN</label>
+                                <input type="text" id="input-origen" class="input-rsw-autocomplete"
+                                    placeholder="¿De dónde sales?" autocomplete="off">
+                                <input type="hidden" id="iata-origen">
+                                <div id="results-origen" class="rsw-results-list"></div>
+                            </div>
+                        </div>
+
+                        <div class="index-search-divider"></div>
+
+                        <div class="index-search-item" style="position: relative;">
+                            <div class="index-search-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                            </div>
+                            <div class="index-search-info">
+                                <label>DESTINO</label>
+                                <input type="text" id="input-destino" class="input-rsw-autocomplete"
+                                    placeholder="¿A dónde vamos?" autocomplete="off">
+                                <input type="hidden" id="iata-destino">
+                                <div id="results-destino" class="rsw-results-list"></div>
+                            </div>
+                        </div>
+
+                        <div class="index-search-divider"></div>
+
+                        <div class="index-search-item">
+                            <div class="index-search-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </div>
+                            <div class="index-search-info">
+                                <label>Ida</label>
+                                <input type="text" id="fecha-ida" class="index-input-date input-rsw-autocomplete"
+                                    placeholder="Fecha">
+                            </div>
+                        </div>
+
+                        <div class="index-search-divider"></div>
+
+                        <div class="index-search-item">
+                            <div class="index-search-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </div>
+                            <div class="index-search-info" style="position:relative;">
+                                <label>Vuelta</label>
+                                <input type="text" id="fecha-vuelta" class="index-input-date input-rsw-autocomplete"
+                                    placeholder="Opcional">
+                                <span id="btn-clear-vuelta" onclick="limpiarFechaVuelta(event)"
+                                    style="display:none; position:absolute; right:0; top:35px; cursor:pointer; color:#94a3b8; font-size:1.2rem; line-height:1;">&times;</span>
+                            </div>
+                        </div>
+
+                        <div class="index-search-divider"></div>
+
+                        <div class="index-search-item" style="position: relative;" id="passengers-selector">
+                            <div class="index-search-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                            </div>
+                            <div class="index-search-info">
+                                <label>Pasajeros</label>
+                                <div class="index-select-display input-rsw-autocomplete" id="passengers-display"
+                                    style="cursor: pointer;">
+                                    1 adulto
+                                </div>
+                            </div>
+
+                            <div class="passengers-dropdown" id="passengers-dropdown">
+                                <div class="passenger-row">
+                                    <div class="passenger-info">
+                                        <h4>Adultos</h4>
+                                        <p>Mayores de 18 años</p>
+                                    </div>
+                                    <div class="passenger-controls">
+                                        <button type="button" class="passenger-btn" id="btn-minus-adultos"
+                                            onclick="cambiarPasajeros('adultos', -1)">−</button>
+                                        <span class="passenger-count" id="count-adultos">1</span>
+                                        <button type="button" class="passenger-btn" id="btn-plus-adultos"
+                                            onclick="cambiarPasajeros('adultos', 1)">+</button>
+                                    </div>
+                                </div>
+
+                                <div class="passenger-row">
+                                    <div class="passenger-info">
+                                        <h4>Niños</h4>
+                                        <p>0 - 17 años</p>
+                                    </div>
+                                    <div class="passenger-controls">
+                                        <button type="button" class="passenger-btn" id="btn-minus-ninos"
+                                            onclick="cambiarPasajeros('ninos', -1)">−</button>
+                                        <span class="passenger-count" id="count-ninos">0</span>
+                                        <button type="button" class="passenger-btn" id="btn-plus-ninos"
+                                            onclick="cambiarPasajeros('ninos', 1)">+</button>
+                                    </div>
+                                </div>
+
+                                <button type="button" class="passengers-done-btn"
+                                    onclick="cerrarSelectorPasajeros()">Listo</button>
+                            </div>
+                        </div>
+
+                        <button class="index-btn-search" id="btn-buscador" onclick="ejecutarBusqueda()">
+                            <span id="btn-text">BUSCAR</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Multidestino & Nómada Segment List -->
+                <!-- Opciones Multidestino Eliminadas -->
+            </div>
+    </section>
+
+    <section class="destinos-grid-premium" id="seccion-resultados">
+        <div class="section-title" style="text-align: center; margin-bottom: 60px;">
+            <h2 style="font-size: 3rem; color: var(--text-main); font-weight: 800;">Resultados de vuelos</h2>
+            <div class="underline" style="width: 80px; height: 3px; background: var(--accent); margin: 20px auto;">
             </div>
         </div>
-        {% endfor %}
+
+        <div class="results-control-bar" id="barra-filtros" style="display:none;">
+            <div class="sort-cards-container">
+                <div class="sort-card active" onclick="ordenarResultados('recomendado', this)">
+                    <div class="sort-label">Recomendado</div>
+                    <div class="sort-value">El mejor</div>
+                </div>
+                <div class="sort-card" onclick="ordenarResultados('precio', this)">
+                    <div class="sort-label">Más Barato</div>
+                    <div class="sort-value" id="label-barato">-- €</div>
+                </div>
+                <div class="sort-card" onclick="ordenarResultados('rapido', this)">
+                    <div class="sort-label">Más Rápido</div>
+                    <div class="sort-value" id="label-rapido">-- h</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-two-column-layout">
+            <aside class="results-left-column">
+                <div class="flight-filters-panel">
+                <div class="filter-group">
+                    <div class="filter-title">Escalas</div>
+                    <div class="filter-radio-list">
+                        <label><input type="radio" name="filtro-stops" value="direct" onchange="aplicarFiltrosYRenderizar()"> Directo</label>
+                        <label><input type="radio" name="filtro-stops" value="max1" onchange="aplicarFiltrosYRenderizar()"> 1 escala máx.</label>
+                        <label><input type="radio" name="filtro-stops" value="max2" onchange="aplicarFiltrosYRenderizar()"> 2 escalas máx.</label>
+                        <label><input type="radio" name="filtro-stops" value="any" checked onchange="aplicarFiltrosYRenderizar()"> Cualquier número</label>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-title">Hora salida</div>
+                    <div class="time-range-row">
+                        <input id="filtro-hora-salida-desde" class="filter-input" type="time" value="00:00" onchange="aplicarFiltrosYRenderizar()">
+                        <span>—</span>
+                        <input id="filtro-hora-salida-hasta" class="filter-input" type="time" value="23:59" onchange="aplicarFiltrosYRenderizar()">
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <div class="filter-title">Hora llegada</div>
+                    <div class="time-range-row">
+                        <input id="filtro-hora-llegada-desde" class="filter-input" type="time" value="00:00" onchange="aplicarFiltrosYRenderizar()">
+                        <span>—</span>
+                        <input id="filtro-hora-llegada-hasta" class="filter-input" type="time" value="23:59" onchange="aplicarFiltrosYRenderizar()">
+                    </div>
+                </div>
+
+                <div class="filter-toggle-container">
+                    <div class="filter-toggle-item">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="filtro-escalas" onchange="aplicarFiltrosYRenderizar()">
+                            <span class="slider"></span>
+                        </label>
+                        <span>Solo vuelos directos</span>
+                    </div>
+
+                    <div class="filter-toggle-item">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="filtro-maletas" onchange="aplicarFiltrosYRenderizar()">
+                            <span class="slider"></span>
+                        </label>
+                        <span>Equipaje incluido</span>
+                    </div>
+
+                    <button type="button" class="btn-reset-flight-filters" onclick="limpiarFiltrosVuelo()">Limpiar filtros</button>
+                </div>
+                </div>
+            </aside>
+
+            <div class="results-right-column">
+                <div class="grid-luxe-layout" id="resultados-busqueda-container">
+                    <!-- Tours ocultos temporalmente: este contenedor se rellena con resultados de vuelos -->
+                    {#
+                    {% if viajes %}
+                    {% for v in viajes %}
+                    <article class="card-reveal">
+                        <div class="card-inner">
+                            <div class="card-image-wrapper" data-id="{{ v.id_viaje }}">
+                                <img src="{{ v.url_imagen if v.url_imagen else url_for('static', filename='imagenes/heroinicio.png') }}"
+                                    alt="{{ v.nombre }}" loading="lazy" decoding="async"
+                                    onerror="this.onerror=null;this.src='{{ url_for('static', filename='imagenes/heroinicio.png') }}';">
+                            </div>
+                            <div class="card-glass-content">
+                                <span class="location-badge">Pack Exclusivo</span>
+                                <h3 class="dest-name-small">{{ (v.nombre or 'Destino exclusivo') | striptags | truncate(55) }}</h3>
+                                <div class="content-hidden">
+                                    <p>{{ (v.descripcion or 'Consulta disponibilidad para este destino.') | striptags | truncate(150) }}</p>
+                                    <div class="footer-card">
+                                        <span class="price-box">Desde {{ v.precio_desde|int }}€</span>
+                                        <a href="{{ url_for('destinos', tour_id=v.id_viaje) }}" class="btn-reserva">Ver
+                                            Destino</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                    {% endif %}
+                    #}
+                </div>
+            </div>
+        </div>
+
+        {#
+        <div style="text-align: center; margin-top: 60px;">
+            <a href="{{ url_for('destinos') }}" class="btn-ver-todos-destinos">
+                VER TODOS LOS DESTINOS ({{ filtros_stats.total_tours if filtros_stats else
+                '3000+' }} TOURS) →
+            </a>
+        </div>
+        #}
+    </section>
+
+    <div id="custom-modal" class="modal-overlay" onclick="if(event.target == this) cerrarModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div id="modal-icon" class="modal-icon">🌍</div>
+                <button class="close-modal" onclick="cerrarModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3 id="modal-title">Solicitud enviada</h3>
+                <p>Nos pondremos en contacto contigo pronto.</p>
+            </div>
+        </div>
     </div>
 
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <h2 id="mTitle">Reservar</h2>
-            <form action="/create-checkout-session" method="POST">
-                <input type="hidden" name="id_viaje" id="id_viaje">
-                <div id="pax-list"></div>
-                <button type="button" class="btn-add" onclick="addPax()">+ Añadir Pasajero</button>
-                <h3 style="text-align:right;">Total: <span id="total">0</span> €</h3>
-                <button type="submit">Pagar</button>
-                <button type="button" class="close" onclick="cerrar()">Cancelar</button>
+    <section class="trust-section">
+        <div class="container">
+            <div class="trust-content">
+                <div class="trust-text">
+                    <span class="badge">¿Por qué Viatges Carcaixent?</span>
+                    <h2>Más que una agencia, tus compañeros de ruta</h2>
+                    <p>En Viatges Carcaixent no solo vendemos billetes, diseñamos experiencias que se quedan grabadas
+                        para siempre.</p>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <h4 class="counter" data-target="15">0</h4>
+                            <p>Años de Experiencia</p>
+                        </div>
+                        <div class="stat-item">
+                            <h4 class="counter" data-target="1200">0</h4>
+                            <p>Viajeros Felices</p>
+                        </div>
+                        <div class="stat-item">
+                            <h4 class="counter" data-target="100">0</h4>
+                            <p>Personalizado</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="trust-image">
+                    <div class="image-blob">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600"
+                            alt="Agente">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="editorial-value">
+        <div class="container-editorial">
+            <div class="editorial-grid">
+                <div class="editorial-image">
+                    <div class="img-wrapper-main">
+                        <img src="{{ url_for('static', filename='imagenes/playa.png') }}" alt="Paraíso">
+                    </div>
+                </div>
+                <div class="editorial-text">
+                    <span class="eyebrow">EL SELLO DE ANDREA</span>
+                    <h2>Viajes sin plantillas, <br><span class="highlight">historias sin guion.</span></h2>
+                    <p>En <strong>Viatges Carcaixent</strong>, cada itinerario es un lienzo en blanco. Olvídate de los
+                        paquetes cerrados; nosotros diseñamos la ruta, tú eliges el ritmo.</p>
+                    <ul class="luxury-list">
+                        <li><span>01</span> Atención personalizada 24/7</li>
+                        <li><span>02</span> Selección premium de alojamientos</li>
+                        <li><span>03</span> Gestión integral de visados y seguros</li>
+                    </ul>
+                    <div class="editorial-cta">
+                        <button id="btn-aventura" class="btn-editorial" onclick="simularEnvioAventura(this)">
+                            <span class="btn-text">SOLICITAR CONTACTO CON ANDREA</span>
+                            <svg class="icon-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pre-footer-cta">
+        <div class="cta-box">
+            <h2>¿Tienes un destino en mente?</h2>
+            <p>Hablemos y diseñemos juntos el itinerario perfecto para ti.</p>
+            <button class="btn-primary-rsw" onclick="location.href='presupuesto.html'">
+                SOLICITAR PRESUPUESTO PERSONALIZADO
+            </button>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-info">
+                <a href="{{ url_for('home') }}">
+                    <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="Viatges Carcaixent"
+                        class="footer-logo">
+                </a>
+                <p>Tu agencia de confianza en Carcaixent. Diseñamos experiencias, no solo viajes.</p>
+            </div>
+            <div class="footer-links">
+                <h4>EXPLORA</h4>
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Inicio</a></li>
+                    <li><a href="#">Destinos</a></li>
+                    <li><a href="#">Cruceros</a></li>
+                    <li><a href="#">Ofertas</a></li>
+                    <li><a href="{{ url_for('legal') }}">Aviso Legal</a></li>
+                </ul>
+            </div>
+            <div class="footer-contact">
+                <h4>CONTACTO</h4>
+                <p class="contact-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="footer-icon">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    Calle Mayor, Carcaixent
+                </p>
+                <p class="contact-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="footer-icon">
+                        <path
+                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l2.27-2.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                        </path>
+                    </svg>
+                    +34 000 000 000
+                </p>
+                <p class="contact-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="footer-icon">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    info@viatgescarcaixent.com
+                </p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Viatges Carcaixent - Todos los derechos reservados.</p>
+            <p class="rsw-signature">Crafted by <span>RSW Studio</span></p>
+        </div>
+    </footer>
+
+    <div id="modal-detalle-vuelo" class="flight-modal-overlay" onclick="if(event.target == this) cerrarModalVuelo()">
+        <div class="flight-modal-content">
+            <div class="fm-header">
+                <div class="fm-title">
+                    <h3 id="fm-route">MAD ➝ LON</h3>
+                    <p id="fm-airline">Iberia</p>
+                </div>
+                <div class="fm-close" onclick="cerrarModalVuelo()">✕</div>
+            </div>
+
+            <div id="fm-timeline" class="timeline-container">
+            </div>
+
+            <div class="checkin-info-card">
+                <div class="checkin-header">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <h4>INFORMACIÓN DE VIAJE</h4>
+                </div>
+                <div class="checkin-body">
+                    <p><span>📱</span> <span>Check-in online disponible <b>24h antes</b> del vuelo.</span></p>
+                    <p><span>🕒</span> <span>Se recomienda llegar al aeropuerto <b>2 horas antes</b>.</span></p>
+                    <p><span>🧳</span> <span>Equipaje incluido según la tarifa seleccionada.</span></p>
+                </div>
+            </div>
+
+            <div class="fm-footer">
+                <div class="fm-price" id="fm-total-price">120€</div>
+                <button class="fm-btn-buy" id="fm-btn-continuar">CONTINUAR COMPRA</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-formulario-compra" class="flight-modal-overlay">
+        <div class="flight-modal-content">
+            <div class="fm-header">
+                <div class="fm-title">
+                    <h3>Datos del Pasajero</h3>
+                    <p>Rellena la información para emitir los billetes</p>
+                </div>
+                <div class="fm-close" onclick="cerrarModalCompra()">✕</div>
+            </div>
+
+            <div id="resumen-vuelos-seleccionados"
+                style="background:#f8fafc; border-radius:12px; padding:20px; margin-bottom:25px; border:2px solid #e2e8f0;">
+            </div>
+
+            <form id="form-compra-vuelo" onsubmit="event.preventDefault(); procesarPagoFinal();">
+                <h4 class="section-header">1. Datos de los Pasajeros</h4>
+                <div id="formularios-pasajeros"></div>
+
+                <h4 class="section-header">2. Equipaje (Ida y Vuelta)</h4>
+                <div id="contenedor-servicios-extra">
+                    <div style="font-size:0.9rem; color:#64748b; padding:10px;">Cargando maletas extra...</div>
+                </div>
+
+                <div class="legal-check">
+                    <input type="checkbox" id="check-legal" required>
+                    <label for="check-legal">He leído y acepto la <a href="{{ url_for('legal') }}" target="_blank"
+                            style="color:#6366f1;">Política de Privacidad</a> y las Condiciones Generales de Viatges
+                        Carcaixent.</label>
+                </div>
+                <p class="legal-note">Tus datos serán tratados por Viatges Carcaixent para gestionar tu reserva. Tienes
+                    derecho a acceder, rectificar y suprimir tus datos.</p>
+
+                <div class="price-summary-bar">
+                    <div>
+                        <span class="ps-total-label">Total a pagar</span>
+                        <div class="ps-total-amount" id="precio-final-display">0€</div>
+                    </div>
+                    <button type="button" class="fm-btn-buy" id="btn-confirm-payment" style="display:none;"
+                        onclick="confirmarPagoTarjeta()">PAGAR AHORA</button>
+                    <button type="submit" class="fm-btn-buy" id="btn-submit-reserva">IR AL PAGO SEGURO</button>
+                </div>
+
+                <div id="payment-card-section" style="margin-top: 15px; margin-bottom: 20px; display:none;">
+                    <h4 style="margin-bottom: 10px; color: #374151;">Datos de Pago</h4>
+                    <duffel-card-form id="duffel-card-component"></duffel-card-form>
+                    <p id="card-error-msg" style="color: red; font-size: 0.9em; margin-top: 5px; display: none;"></p>
+                </div>
             </form>
         </div>
     </div>
 
+    <div id="modal-contacto" class="flight-modal-overlay">
+        <div class="flight-modal-content" style="max-width: 500px;">
+            <div class="fm-header">
+                <div class="fm-title">
+                    <h3>Solicitar Presupuesto</h3>
+                    <p id="mc-tour-name" style="color:var(--primary); font-weight:700;">Viaje a ...</p>
+                </div>
+                <div class="fm-close" onclick="cerrarModalContacto()">✕</div>
+            </div>
+
+            <form id="form-contacto-tour" onsubmit="event.preventDefault(); enviarSolicitudTour();">
+                <input type="hidden" id="mc-tour-id">
+
+                <div class="purchase-form-grid" style="grid-template-columns: 1fr;">
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" id="mc-nombre" required class="input-rsw">
+                    </div>
+                    <div class="form-group">
+                        <label>Apellidos</label>
+                        <input type="text" id="mc-apellidos" required class="input-rsw">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="mc-email" required class="input-rsw">
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="tel" id="mc-telefono" required class="input-rsw">
+                    </div>
+                    <div class="form-group">
+                        <label>Mensaje / Preferencias</label>
+                        <textarea id="mc-mensaje"
+                            style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:8px; font-family:'Inter';"
+                            rows="3" placeholder="¿Cuantas personas sois? ¿Fechas flexibles?"></textarea>
+                    </div>
+                </div>
+
+                <div class="legal-check">
+                    <input type="checkbox" id="mc-legal" required>
+                    <label for="mc-legal">Acepto la <a href="/legal" target="_blank"
+                            style="color:var(--primary);">Política de Privacidad</a></label>
+                </div>
+
+                <p class="contact-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="footer-icon">
+                        <path
+                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l2.27-2.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                        </path>
+                    </svg>
+                    +34 000 000 000
+                </p>
+                <p class="contact-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="footer-icon">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    info@viatgescarcaixent.com
+                </p>
+
+                <button type="submit" class="fm-btn-buy" style="width:100%; margin-top: 12px;">ENVIAR
+                    SOLICITUD</button>
+            </form>
+        </div>
+    </div>
+
+
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+    <!-- Cookie Consent -->
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}"></script>
+
     <script>
-        let precio = 0, count = 0;
-        function abrir(id, nom, pr) {
-            document.getElementById('modal').style.display = 'flex';
-            document.getElementById('id_viaje').value = id;
-            document.getElementById('mTitle').innerText = nom;
-            precio = pr;
-            document.getElementById('pax-list').innerHTML = '';
-            count = 0; addPax();
+        // --- VARIABLES GLOBALES ---
+        let vuelosGlobales = [];
+        let vuelosIdaGlobales = [];
+        let vuelosVueltaGlobales = [];
+        let vueloSeleccionado = null;
+        let vueloIdaSeleccionado = null;
+        let vueloVueltaSeleccionado = null;
+        let extraMaletas = 0;
+        let servicioSeleccionadoId = null;
+        let criterioOrden = 'recomendado';
+        let modoSeleccion = 'ida';
+        let esViajeRedondo = false;
+        let asientosSeleccionados = [];
+        let fechaBusqueda = new Date().toISOString().split('T')[0]; // Fallback por si acaso
+        
+        // FASE 4: Familia tarifaria seleccionada en ida (para sincronizar con vuelta)
+        let familiaTarifariaIdaSeleccionada = null;
+
+        let pasajeros = {
+            adultos: 1,
+            ninos: 0
+        };
+
+        let preciosIdaPorFecha = {};
+        let preciosVueltaPorFecha = {};
+        let rangosPreciosIda = null;
+        let rangosPreciosVuelta = null;
+        const calendarPricesRequestState = { ida: 0, vuelta: 0 };
+
+        // --- CONFIGURACIÓN DE FLATPICKR ---
+        let flatpickrIda, flatpickrVuelta;
+
+        function parseDateDMY(fechaStr) {
+            if (!fechaStr || !fechaStr.includes('/')) return null;
+            const [d, m, y] = fechaStr.split('/').map(Number);
+            if (!d || !m || !y) return null;
+            return new Date(y, m - 1, d);
         }
-        function cerrar() { document.getElementById('modal').style.display = 'none'; }
-        function addPax() {
-            count++;
-            let div = document.createElement('div'); div.className = 'pax-item';
-            div.innerHTML = `<b>Pasajero ${count}</b><input name="nombres[]" placeholder="Nombre" required><input name="dnis[]" placeholder="DNI" required>`;
-            document.getElementById('pax-list').appendChild(div);
-            actualizar();
+
+        function toISODateLocal(dateObj) {
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
         }
-        function actualizar() { document.getElementById('total').innerText = (count * precio).toFixed(2); }
+
+        function getRutaCalendario(tipo) {
+            const origenBase = (document.getElementById('iata-origen').value || '').trim().toUpperCase();
+            const destinoBase = (document.getElementById('iata-destino').value || '').trim().toUpperCase();
+
+            if (tipo === 'vuelta') {
+                return { origen: destinoBase, destino: origenBase };
+            }
+
+            return { origen: origenBase, destino: destinoBase };
+        }
+
+        function limpiarPreciosCalendario(tipo = null) {
+            if (!tipo || tipo === 'ida') {
+                preciosIdaPorFecha = {};
+                rangosPreciosIda = null;
+            }
+            if (!tipo || tipo === 'vuelta') {
+                preciosVueltaPorFecha = {};
+                rangosPreciosVuelta = null;
+            }
+        }
+
+        function calcularRangosPrecios(preciosMap) {
+            const valores = Object.values(preciosMap || {})
+                .map(v => Number(v))
+                .filter(v => Number.isFinite(v) && v > 0)
+                .sort((a, b) => a - b);
+
+            if (!valores.length) return null;
+
+            const idxBajo = Math.floor((valores.length - 1) * 0.33);
+            const idxAlto = Math.floor((valores.length - 1) * 0.66);
+
+            return {
+                bajoMax: valores[idxBajo],
+                altoMin: valores[idxAlto]
+            };
+        }
+
+        function obtenerClasePrecio(precio, rangos) {
+            if (!precio || !rangos) return 'normal';
+            if (precio <= rangos.bajoMax) return 'cheap';
+            if (precio >= rangos.altoMin) return 'expensive';
+            return 'normal';
+        }
+
+        function pintarPrecioDia(dayElem, precio, rangos) {
+            if (!precio || dayElem.classList.contains('prevMonthDay') || dayElem.classList.contains('nextMonthDay')) {
+                return;
+            }
+
+            const priceClass = obtenerClasePrecio(precio, rangos);
+
+            dayElem.classList.remove('fp-price-cheap', 'fp-price-normal', 'fp-price-expensive');
+
+            let priceEl = dayElem.querySelector('.fp-day-price');
+            if (!priceEl) {
+                priceEl = document.createElement('span');
+                priceEl.className = 'fp-day-price';
+                dayElem.appendChild(priceEl);
+            }
+            priceEl.textContent = `${precio} €`;
+
+            dayElem.classList.add('has-price');
+            dayElem.classList.add(`fp-price-${priceClass}`);
+        }
+
+        async function cargarPreciosCalendario(tipo, instance) {
+            if (!instance) return;
+
+            const { origen, destino } = getRutaCalendario(tipo);
+            if (origen.length !== 3 || destino.length !== 3) {
+                limpiarPreciosCalendario(tipo);
+                instance.redraw();
+                return;
+            }
+
+            if (tipo === 'vuelta' && !document.getElementById('fecha-ida').value) {
+                limpiarPreciosCalendario('vuelta');
+                instance.redraw();
+                return;
+            }
+
+            const year = instance.currentYear;
+            const month = instance.currentMonth + 1;
+
+            const requestId = ++calendarPricesRequestState[tipo];
+
+            try {
+                const params = new URLSearchParams({
+                    origen,
+                    destino,
+                    year: String(year),
+                    month: String(month),
+                    adultos: String(pasajeros.adultos || 1),
+                    ninos: String(pasajeros.ninos || 0),
+                    bebes: '0',
+                    clase: 'economy'
+                });
+
+                const res = await fetch(`/api/precios-calendario?${params.toString()}`);
+                if (!res.ok) return;
+
+                const data = await res.json();
+                if (requestId !== calendarPricesRequestState[tipo]) return;
+
+                if (tipo === 'ida') {
+                    preciosIdaPorFecha = (data && data.prices) || {};
+                    rangosPreciosIda = calcularRangosPrecios(preciosIdaPorFecha);
+                } else {
+                    preciosVueltaPorFecha = (data && data.prices) || {};
+                    rangosPreciosVuelta = calcularRangosPrecios(preciosVueltaPorFecha);
+                }
+
+                instance.redraw();
+            } catch (err) {
+                console.warn('No se pudieron cargar precios del calendario', err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            flatpickrIda = flatpickr("#fecha-ida", {
+                locale: "es",
+                dateFormat: "d/m/Y",
+                minDate: "today",
+                onOpen: function (selectedDates, dateStr, instance) {
+                    cargarPreciosCalendario('ida', instance);
+                },
+                onMonthChange: function (selectedDates, dateStr, instance) {
+                    cargarPreciosCalendario('ida', instance);
+                },
+                onYearChange: function (selectedDates, dateStr, instance) {
+                    cargarPreciosCalendario('ida', instance);
+                },
+                onDayCreate: function (dObj, dStr, instance, dayElem) {
+                    const fechaISO = toISODateLocal(dayElem.dateObj);
+                    const precio = preciosIdaPorFecha[fechaISO];
+                    pintarPrecioDia(dayElem, precio, rangosPreciosIda);
+                },
+                onChange: function (selectedDates, dateStr, instance) {
+                    if (flatpickrVuelta && selectedDates[0]) {
+                        const minVuelta = new Date(selectedDates[0]);
+                        flatpickrVuelta.set('minDate', minVuelta);
+
+                        const fechaVueltaActual = flatpickrVuelta.selectedDates[0];
+                        if (fechaVueltaActual && fechaVueltaActual < selectedDates[0]) {
+                            flatpickrVuelta.clear();
+                            mostrarOcultarLimpiarVuelta('');
+                        }
+                    }
+
+                    if (flatpickrVuelta && flatpickrVuelta.isOpen) {
+                        cargarPreciosCalendario('vuelta', flatpickrVuelta);
+                    }
+                }
+            });
+
+            flatpickrVuelta = flatpickr("#fecha-vuelta", {
+                locale: "es",
+                dateFormat: "d/m/Y",
+                minDate: "today",
+                onOpen: function (selectedDates, dateStr, instance) {
+                    cargarPreciosCalendario('vuelta', instance);
+                },
+                onMonthChange: function (selectedDates, dateStr, instance) {
+                    cargarPreciosCalendario('vuelta', instance);
+                },
+                onYearChange: function (selectedDates, dateStr, instance) {
+                    cargarPreciosCalendario('vuelta', instance);
+                },
+                onDayCreate: function (dObj, dStr, instance, dayElem) {
+                    const fechaISO = toISODateLocal(dayElem.dateObj);
+                    const precio = preciosVueltaPorFecha[fechaISO];
+                    pintarPrecioDia(dayElem, precio, rangosPreciosVuelta);
+                },
+                onChange: function (selectedDates, dateStr, instance) {
+                    mostrarOcultarLimpiarVuelta(dateStr);
+                }
+            });
+
+            // Comprobar estado inicial del botón limpiar
+            mostrarOcultarLimpiarVuelta(document.getElementById('fecha-vuelta').value);
+
+            actualizarDisplayPasajeros();
+            actualizarBotonesPasajeros();
+        });
+
+        // --- FUNCIONES EXTRA (LIMPIAR FECHA) ---
+        function mostrarOcultarLimpiarVuelta(dateStr) {
+            const btn = document.getElementById('btn-clear-vuelta');
+            if (dateStr && dateStr.trim() !== '') {
+                btn.style.display = 'block';
+            } else {
+                btn.style.display = 'none';
+            }
+        }
+
+        function limpiarFechaVuelta(e) {
+            if (e) e.stopPropagation();
+            if (flatpickrVuelta) flatpickrVuelta.clear();
+            mostrarOcultarLimpiarVuelta('');
+        }
+
+        // --- SELECTOR DE PASAJEROS ---
+        document.getElementById('passengers-display').addEventListener('click', function () {
+            const dropdown = document.getElementById('passengers-dropdown');
+            if (dropdown.classList.contains('active')) {
+                dropdown.classList.remove('active');
+                setTimeout(() => {
+                    dropdown.style.display = 'none';
+                }, 300);
+            } else {
+                dropdown.style.display = 'block';
+                setTimeout(() => {
+                    dropdown.classList.add('active');
+                }, 10);
+            }
+        });
+
+        function cambiarPasajeros(tipo, delta) {
+            const nuevoValor = pasajeros[tipo] + delta;
+
+            if (tipo === 'adultos') {
+                if (nuevoValor < 1 || nuevoValor > 9) return;
+                pasajeros.adultos = nuevoValor;
+            } else if (tipo === 'ninos') {
+                if (nuevoValor < 0 || nuevoValor > 9) return;
+                if (pasajeros.adultos + nuevoValor > 9) return;
+                pasajeros.ninos = nuevoValor;
+            }
+
+            actualizarDisplayPasajeros();
+            actualizarBotonesPasajeros();
+        }
+
+        function actualizarDisplayPasajeros() {
+            document.getElementById('count-adultos').innerText = pasajeros.adultos;
+            document.getElementById('count-ninos').innerText = pasajeros.ninos;
+
+            let texto = `${pasajeros.adultos} adulto${pasajeros.adultos > 1 ? 's' : ''}`;
+            if (pasajeros.ninos > 0) {
+                texto += `, ${pasajeros.ninos} niño${pasajeros.ninos > 1 ? 's' : ''}`;
+            }
+            document.getElementById('passengers-display').innerText = texto;
+        }
+
+        function actualizarBotonesPasajeros() {
+            const totalPasajeros = pasajeros.adultos + pasajeros.ninos;
+
+            document.getElementById('btn-minus-adultos').disabled = pasajeros.adultos <= 1;
+            document.getElementById('btn-plus-adultos').disabled = pasajeros.adultos >= 9 || totalPasajeros >= 9;
+
+            document.getElementById('btn-minus-ninos').disabled = pasajeros.ninos <= 0;
+            document.getElementById('btn-plus-ninos').disabled = totalPasajeros >= 9;
+        }
+
+        function cerrarSelectorPasajeros() {
+            const dropdown = document.getElementById('passengers-dropdown');
+            dropdown.classList.remove('active');
+            setTimeout(() => {
+                dropdown.style.display = 'none';
+            }, 300);
+        }
+
+        document.addEventListener('click', function (e) {
+            const selector = document.getElementById('passengers-selector');
+            const dropdown = document.getElementById('passengers-dropdown');
+
+            if (!selector.contains(e.target) && dropdown.classList.contains('active')) {
+                dropdown.classList.remove('active');
+                setTimeout(() => {
+                    dropdown.style.display = 'none';
+                }, 300);
+            }
+        });
+
+        // --- AUTOCOMPLETE ---
+        const AUTOCOMPLETE_DEBOUNCE_MS = 180;
+        const autocompleteCache = new Map();
+        const autocompleteAbortControllers = {
+            'input-origen': null,
+            'input-destino': null
+        };
+        const autocompleteRequestSeq = {
+            'input-origen': 0,
+            'input-destino': 0
+        };
+
+        let timeoutOrigen, timeoutDestino;
+
+        document.getElementById('input-origen').addEventListener('input', function () {
+            clearTimeout(timeoutOrigen);
+            document.getElementById('iata-origen').value = '';
+            limpiarPreciosCalendario();
+            if (flatpickrIda) flatpickrIda.redraw();
+            if (flatpickrVuelta) flatpickrVuelta.redraw();
+            const txt = this.value;
+            timeoutOrigen = setTimeout(() => buscarEnAPI(txt, document.getElementById('results-origen'), 'input-origen', 'iata-origen'), AUTOCOMPLETE_DEBOUNCE_MS);
+        });
+
+        document.getElementById('input-destino').addEventListener('input', function () {
+            clearTimeout(timeoutDestino);
+            document.getElementById('iata-destino').value = '';
+            limpiarPreciosCalendario();
+            if (flatpickrIda) flatpickrIda.redraw();
+            if (flatpickrVuelta) flatpickrVuelta.redraw();
+            const txt = this.value;
+            timeoutDestino = setTimeout(() => buscarEnAPI(txt, document.getElementById('results-destino'), 'input-destino', 'iata-destino'), AUTOCOMPLETE_DEBOUNCE_MS);
+        });
+
+        function desglosarEtiquetaAeropuerto(label, code) {
+            const codeFromLabel = (label.match(/\(([A-Z]{3})\)\s*$/) || [])[1] || code || '';
+            const title = label.replace(/\s*\([A-Z]{3}\)\s*$/, '').trim();
+            return { title, code: codeFromLabel };
+        }
+
+        function renderResultadosAutocomplete(data, list, inputId, hiddenId) {
+            list.innerHTML = '';
+
+            if (!Array.isArray(data) || data.length === 0) {
+                list.style.display = 'none';
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+            data.forEach((d) => {
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'rsw-result-item';
+
+                const airport = desglosarEtiquetaAeropuerto(d.label || '', d.value || '');
+                item.innerHTML = `
+                    <span class="rsw-result-main">${airport.title}</span>
+                    <span class="rsw-result-meta">${airport.code}</span>
+                `;
+
+                item.addEventListener('click', () => {
+                    document.getElementById(inputId).value = d.label;
+                    document.getElementById(hiddenId).value = d.value;
+                    list.style.display = 'none';
+
+                    limpiarPreciosCalendario();
+                    if (flatpickrIda && flatpickrIda.isOpen) {
+                        cargarPreciosCalendario('ida', flatpickrIda);
+                    } else if (flatpickrIda) {
+                        flatpickrIda.redraw();
+                    }
+
+                    if (flatpickrVuelta && flatpickrVuelta.isOpen) {
+                        cargarPreciosCalendario('vuelta', flatpickrVuelta);
+                    } else if (flatpickrVuelta) {
+                        flatpickrVuelta.redraw();
+                    }
+                });
+
+                fragment.appendChild(item);
+            });
+
+            list.appendChild(fragment);
+            list.style.display = 'block';
+        }
+
+        async function buscarEnAPI(txt, list, inputId, hiddenId) {
+            const termino = txt.trim();
+
+            if (termino.length < 2) {
+                list.style.display = 'none';
+                list.innerHTML = '';
+                return;
+            }
+
+            const cacheKey = termino.toLowerCase();
+            if (autocompleteCache.has(cacheKey)) {
+                renderResultadosAutocomplete(autocompleteCache.get(cacheKey), list, inputId, hiddenId);
+                return;
+            }
+
+            if (autocompleteAbortControllers[inputId]) {
+                autocompleteAbortControllers[inputId].abort();
+            }
+
+            const currentRequest = ++autocompleteRequestSeq[inputId];
+            const controller = new AbortController();
+            autocompleteAbortControllers[inputId] = controller;
+
+            list.classList.add('is-loading');
+
+            try {
+                const res = await fetch(`/api/autocomplete?term=${encodeURIComponent(termino)}`, {
+                    signal: controller.signal
+                });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const data = await res.json();
+
+                if (currentRequest !== autocompleteRequestSeq[inputId]) {
+                    return;
+                }
+
+                autocompleteCache.set(cacheKey, data);
+                renderResultadosAutocomplete(data, list, inputId, hiddenId);
+            } catch (e) {
+                if (e.name !== 'AbortError') {
+                    console.error('❌ Error autocompletado:', e);
+                    list.style.display = 'none';
+                }
+            } finally {
+                list.classList.remove('is-loading');
+            }
+        }
+
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.index-search-item')) {
+                document.querySelectorAll('.rsw-results-list').forEach(l => l.style.display = 'none');
+            }
+        });
+
+        // --- BUSCADOR PRINCIPAL ---
+        async function animarBusquedaRSW() {
+            let origen = document.getElementById('iata-origen').value || document.getElementById('input-origen').value;
+            let destino = document.getElementById('iata-destino').value || document.getElementById('input-destino').value;
+            let fecha = document.getElementById('fecha-ida').value;
+            let vuelta = document.getElementById('fecha-vuelta').value;
+
+            if (!origen || !destino || !fecha) { alert("Rellena Origen, Destino y Fecha de Ida"); return; }
+
+            if (vuelta && vuelta.trim() !== '') {
+                const fechaIdaObj = parseDateDMY(fecha);
+                const fechaVueltaObj = parseDateDMY(vuelta);
+                if (fechaIdaObj && fechaVueltaObj && fechaVueltaObj < fechaIdaObj) {
+                    alert("La fecha de vuelta no puede ser anterior a la fecha de ida.");
+                    return;
+                }
+            }
+
+            esViajeRedondo = vuelta && vuelta.trim() !== '';
+            modoSeleccion = 'ida';
+            vueloIdaSeleccionado = null;
+            vueloVueltaSeleccionado = null;
+
+            const grid = document.getElementById('resultados-busqueda-container');
+            const barra = document.getElementById('barra-filtros');
+
+            barra.style.display = 'none';
+            grid.innerHTML = `
+        <div class="loading-screen-improved">
+            <div class="loading-animation">
+                <img src="{{ url_for('static', filename='imagenes/logosintexto.png') }}" alt="Cargando..." class="loading-logo pulse">
+                <div class="loading-progress-bar">
+                    <div class="loading-progress-fill"></div>
+                </div>
+            </div>
+            <div class="loading-text">Buscando los mejores vuelos</div>
+            <div class="loading-subtext">${esViajeRedondo ? 'Buscando ida y vuelta en paralelo...' : 'Esto puede tardar unos segundos...'}</div>
+            <div class="loading-tips">
+                <div class="tip-item">✓ Comparando precios de múltiples aerolíneas</div>
+                <div class="tip-item">✓ Verificando disponibilidad en tiempo real</div>
+                <div class="tip-item">✓ Aplicando las mejores tarifas</div>
+            </div>
+        </div>
+    `;
+
+            grid.className = 'flight-list-container';
+            document.getElementById('seccion-resultados').scrollIntoView({ behavior: 'smooth' });
+
+            try {
+                // FASE 5: Búsqueda paralela para viajes redondos
+                const payloadBase = {
+                    adultos: pasajeros.adultos,
+                    ninos: pasajeros.ninos,
+                    bebes: 0,
+                    clase: 'economy'
+                };
+
+                if (esViajeRedondo) {
+                    // Búsqueda paralela: ida y vuelta al mismo tiempo
+                    const [resIda, resVuelta] = await Promise.all([
+                        fetch('/api/buscar-vuelos', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ origen, destino, fecha, ...payloadBase })
+                        }),
+                        fetch('/api/buscar-vuelos', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                origen: destino, 
+                                destino: origen, 
+                                fecha: vuelta, 
+                                ...payloadBase 
+                            })
+                        })
+                    ]);
+
+                    vuelosIdaGlobales = await resIda.json();
+                    vuelosVueltaGlobales = await resVuelta.json();
+
+                    if (vuelosIdaGlobales.length === 0) {
+                        grid.innerHTML = '<h3 style="text-align:center; padding:30px;">No hay vuelos disponibles.</h3>';
+                        return;
+                    }
+
+                    if (vuelosVueltaGlobales.length === 0) {
+                        grid.innerHTML = '<h3 style="text-align:center; padding:30px;">No hay vuelos de vuelta disponibles.</h3>';
+                        return;
+                    }
+                } else {
+                    // Viaje sencillo: solo ida
+                    const resIda = await fetch('/api/buscar-vuelos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ origen, destino, fecha, ...payloadBase })
+                    });
+                    vuelosIdaGlobales = await resIda.json();
+
+                    if (vuelosIdaGlobales.length === 0) {
+                        grid.innerHTML = '<h3 style="text-align:center; padding:30px;">No hay vuelos disponibles.</h3>';
+                        return;
+                    }
+                }
+
+                vuelosGlobales = vuelosIdaGlobales;
+                barra.style.display = 'block';
+                actualizarOpcionesAerolineas();
+                actualizarEtiquetasResumen();
+                aplicarFiltrosYRenderizar();
+
+                if (esViajeRedondo) {
+                    const headerTitulo = document.createElement('div');
+                    headerTitulo.style.cssText = 'text-align:center; padding:20px; background:#f8fafc; border-radius:12px; margin-bottom:20px;';
+                    headerTitulo.innerHTML = '<h3 style="color:#6366f1; font-size:1.5rem; margin:0;">✈️ Selecciona tu vuelo de IDA</h3>';
+                    grid.insertBefore(headerTitulo, grid.firstChild);
+                }
+
+            } catch (e) {
+                console.error(e);
+                grid.innerHTML = '<h3 style="text-align:center;">Error de conexión.</h3>';
+            }
+        }
+
+        // --- FILTROS Y SORTING ---
+        function ordenarResultados(criterio, elementoDOM) {
+            document.querySelectorAll('.sort-card').forEach(c => c.classList.remove('active'));
+            elementoDOM.classList.add('active');
+            criterioOrden = criterio;
+            aplicarFiltrosYRenderizar();
+        }
+        function actualizarEtiquetasResumen() {
+            if (vuelosGlobales.length === 0) return;
+            const minP = Math.min(...vuelosGlobales.map(v => v.precio)); document.getElementById('label-barato').innerText = minP + ' €';
+            const minD = vuelosGlobales.reduce((min, v) => { const m = parseDuracion(v.duracion); return m < min ? m : min; }, 99999);
+            const h = Math.floor(minD / 60); const m = minD % 60;
+            document.getElementById('label-rapido').innerText = `${h}h ${m}m`;
+        }
+        function parseDuracion(str) {
+            let t = 0;
+            const h = str.match(/(\d+)h/); const m = str.match(/(\d+)m/);
+            if (h) t += parseInt(h[1]) * 60;
+            if (m) t += parseInt(m[1]);
+            return t;
+        }
+
+        function parseHoraMinutos(hora) {
+            if (!hora || !hora.includes(':')) return null;
+            const [h, m] = hora.split(':').map(Number);
+            if (!Number.isFinite(h) || !Number.isFinite(m)) return null;
+            return (h * 60) + m;
+        }
+
+        function dentroRangoHora(valorMinutos, desdeMinutos, hastaMinutos) {
+            if (valorMinutos === null) return true;
+            if (valorMinutos < desdeMinutos) return false;
+            if (valorMinutos > hastaMinutos) return false;
+            return true;
+        }
+
+        function vueloContieneNumero(vuelo, termino) {
+            if (!termino) return true;
+            const t = termino.toLowerCase();
+            const segmentos = Array.isArray(vuelo.segmentos) ? vuelo.segmentos : [];
+            return segmentos.some(s => String(s.vuelo || '').toLowerCase().includes(t));
+        }
+
+        function actualizarOpcionesAerolineas() {
+            const select = document.getElementById('filtro-aerolinea');
+            if (!select) return;
+
+            const valorActual = select.value;
+            const aerolineas = [...new Set((vuelosGlobales || []).map(v => v.aerolinea).filter(Boolean))]
+                .sort((a, b) => a.localeCompare(b));
+
+            select.innerHTML = '<option value="">Todas las aerolíneas</option>';
+            aerolineas.forEach(nombre => {
+                const opt = document.createElement('option');
+                opt.value = nombre;
+                opt.textContent = nombre;
+                select.appendChild(opt);
+            });
+
+            if (aerolineas.includes(valorActual)) {
+                select.value = valorActual;
+            }
+        }
+
+        function limpiarFiltrosVuelo() {
+            const stopsAny = document.querySelector('input[name="filtro-stops"][value="any"]');
+            if (stopsAny) stopsAny.checked = true;
+
+            const airline = document.getElementById('filtro-aerolinea');
+            if (airline) airline.value = '';
+
+            const numeroVuelo = document.getElementById('filtro-numero-vuelo');
+            if (numeroVuelo) numeroVuelo.value = '';
+
+            const salidaDesde = document.getElementById('filtro-hora-salida-desde');
+            const salidaHasta = document.getElementById('filtro-hora-salida-hasta');
+            const llegadaDesde = document.getElementById('filtro-hora-llegada-desde');
+            const llegadaHasta = document.getElementById('filtro-hora-llegada-hasta');
+            if (salidaDesde) salidaDesde.value = '00:00';
+            if (salidaHasta) salidaHasta.value = '23:59';
+            if (llegadaDesde) llegadaDesde.value = '00:00';
+            if (llegadaHasta) llegadaHasta.value = '23:59';
+
+            const directos = document.getElementById('filtro-escalas');
+            const maletas = document.getElementById('filtro-maletas');
+            if (directos) directos.checked = false;
+            if (maletas) maletas.checked = false;
+
+            aplicarFiltrosYRenderizar();
+        }
+
+        function aplicarFiltrosYRenderizar() {
+            const grid = document.getElementById('resultados-busqueda-container');
+            grid.innerHTML = '';
+            // Asegurar clase lista
+            grid.className = 'flight-list-container';
+
+            const soloDirectos = document.getElementById('filtro-escalas').checked;
+            const soloConMaleta = document.getElementById('filtro-maletas').checked;
+            const stopMode = (document.querySelector('input[name="filtro-stops"]:checked') || {}).value || 'any';
+            const aerolineaSeleccionada = (document.getElementById('filtro-aerolinea')?.value || '').toLowerCase();
+            const numeroVueloBuscado = (document.getElementById('filtro-numero-vuelo')?.value || '').trim();
+
+            const salidaDesde = parseHoraMinutos(document.getElementById('filtro-hora-salida-desde')?.value || '00:00') ?? 0;
+            const salidaHasta = parseHoraMinutos(document.getElementById('filtro-hora-salida-hasta')?.value || '23:59') ?? 1439;
+            const llegadaDesde = parseHoraMinutos(document.getElementById('filtro-hora-llegada-desde')?.value || '00:00') ?? 0;
+            const llegadaHasta = parseHoraMinutos(document.getElementById('filtro-hora-llegada-hasta')?.value || '23:59') ?? 1439;
+
+            let resultados = vuelosGlobales.filter(v => {
+                const escalas = Number(v.escala || 0);
+                const cumpleToggleDirectos = soloDirectos ? escalas === 0 : true;
+                let cumpleEscalas = true;
+                if (stopMode === 'direct') cumpleEscalas = escalas === 0;
+                else if (stopMode === 'max1') cumpleEscalas = escalas <= 1;
+                else if (stopMode === 'max2') cumpleEscalas = escalas <= 2;
+
+                const cumpleMaleta = soloConMaleta ? v.con_maleta : true;
+                const cumpleAerolinea = aerolineaSeleccionada ? String(v.aerolinea || '').toLowerCase() === aerolineaSeleccionada : true;
+                const cumpleNumero = vueloContieneNumero(v, numeroVueloBuscado);
+                const cumpleHoraSalida = dentroRangoHora(parseHoraMinutos(v.hora_salida), salidaDesde, salidaHasta);
+                const cumpleHoraLlegada = dentroRangoHora(parseHoraMinutos(v.hora_llegada), llegadaDesde, llegadaHasta);
+                return cumpleToggleDirectos && cumpleEscalas && cumpleMaleta && cumpleAerolinea && cumpleNumero && cumpleHoraSalida && cumpleHoraLlegada;
+            });
+
+            if (resultados.length === 0) { grid.innerHTML = '<h3 style="text-align:center; color:#64748b;">No hay vuelos con estos filtros.</h3>'; return; }
+
+            if (criterioOrden === 'precio') resultados.sort((a, b) => a.precio - b.precio);
+            else if (criterioOrden === 'rapido') resultados.sort((a, b) => parseDuracion(a.duracion) - parseDuracion(b.duracion));
+            else resultados.sort((a, b) => a.precio - b.precio);
+
+            // FASE 3: Agrupar ofertas por vuelo base y mostrar selector de tarifas
+            const grupos = agruparPorVueloBase(resultados);
+            
+            grupos.forEach(grupo => {
+                // Elegir vuelo "base" para mostrar info principal (el más barato del grupo)
+                const vueloBase = grupo.ofertas[0];
+                
+                let label = vueloBase.escala === 1 ? '1 Escala' : `${vueloBase.escala} Escalas`;
+                let graph = vueloBase.escala ? `<div class="frc-line-graphic"><div class="frc-stop-dot"></div></div><div class="frc-stop-text">${label}</div>` : `<div class="frc-line-graphic"></div><div class="frc-direct-text">Directo</div>`;
+
+                let maletaBadge = vueloBase.con_maleta ? '<div class="frc-baggage-badge">💼 Equipaje incluido</div>' : '';
+
+                // Generar selector de tarifas si hay múltiples ofertas
+                // FASE 4: Pasar familia recomendada si estamos mostrando vuelos de vuelta
+                const familiaRecomendada = (modoSeleccion === 'vuelta' && familiaTarifariaIdaSeleccionada) ? familiaTarifariaIdaSeleccionada : null;
+                let tarifasHtml = generarSelectorTarifas(grupo.ofertas, familiaRecomendada);
+
+                const html = `
+        <div class="flight-row-card-group">
+            <div class="frc-main-info">
+                <div class="frc-logo"><img src="${vueloBase.img_logo}" alt="Logo"></div>
+                <div class="frc-route-info">
+                    <div class="frc-times">${vueloBase.hora_salida} – ${vueloBase.hora_llegada}</div>
+                    <div class="frc-airports">${vueloBase.aerolinea}</div>
+                    ${maletaBadge}
+                </div>
+                <div class="frc-stops"><div class="frc-duration">${vueloBase.duracion}</div>${graph}</div>
+            </div>
+            ${tarifasHtml}
+        </div>`;
+                grid.innerHTML += html;
+            });
+        }
+
+        // FASE 3: Agrupa ofertas que comparten el mismo vuelo base
+        function agruparPorVueloBase(ofertas) {
+            const grupos = {};
+            
+            ofertas.forEach(oferta => {
+                const segmentos = oferta.segmentos || [];
+                if (!segmentos.length) return;
+                
+                // Crear clave única: números de vuelo concatenados
+                const vuelos = segmentos.map(s => s.vuelo || 'NA').join('-');
+                const clave = `${oferta.origen}-${oferta.destino}-${vuelos}`;
+                
+                if (!grupos[clave]) {
+                    grupos[clave] = {
+                        clave: clave,
+                        ofertas: []
+                    };
+                }
+                grupos[clave].ofertas.push(oferta);
+            });
+            
+            // Ordenar ofertas dentro de cada grupo por precio
+            Object.values(grupos).forEach(grupo => {
+                grupo.ofertas.sort((a, b) => a.precio - b.precio);
+            });
+            
+            return Object.values(grupos);
+        }
+
+        // FASE 3: Genera HTML del selector de tarifas
+        // FASE 4: Acepta familiaRecomendada para resaltar en vuelos de vuelta
+        function generarSelectorTarifas(ofertas, familiaRecomendada = null) {
+            // Si solo hay una oferta, mostrar diseño simple
+            if (ofertas.length === 1) {
+                const oferta = ofertas[0];
+                const esRecomendada = familiaRecomendada && (oferta.familia_tarifaria || 'Basic') === familiaRecomendada;
+                const claseExtra = esRecomendada ? 'fare-recomendada' : '';
+                return `
+                <div class="frc-fares-single">
+                    <div class="fare-option-single ${claseExtra}">
+                        ${esRecomendada ? '<div class="badge-recomendada">⭐ Recomendado</div>' : ''}
+                        <div class="fare-label">${obtenerEtiquetaFamilia(oferta.familia_tarifaria || 'Basic')}</div>
+                        <div class="fare-price">${oferta.precio} €</div>
+                        <button class="frc-btn" onclick='abrirModalVuelo(${JSON.stringify(oferta)})'>Ver Vuelo</button>
+                    </div>
+                </div>`;
+            }
+            
+            // Agrupar por familia y mostrar solo las 2 primeras más baratas de cada familia
+            const familias = ['Basic', 'Comfort', 'Premium'];
+            const ofertasPorFamilia = {};
+            
+            familias.forEach(familia => {
+                ofertasPorFamilia[familia] = ofertas.filter(o => (o.familia_tarifaria || 'Basic') === familia);
+            });
+            
+            // Generar HTML de las tarifas (mostrar solo las primeras 2 familias con ofertas)
+            let tarifasHtml = '<div class="frc-fares-multi">';
+            let contadorFamilias = 0;
+            
+            familias.forEach(familia => {
+                if (contadorFamilias >= 2) return; // Solo mostrar 2 familias
+                
+                const ofertasFamilia = ofertasPorFamilia[familia];
+                if (!ofertasFamilia || ofertasFamilia.length === 0) return;
+                
+                const ofertaBarata = ofertasFamilia[0]; // La más barata de esta familia
+                const perks = obtenerPerksVisibles(ofertaBarata);
+                
+                // FASE 4: Marcar como recomendada si coincide con la familia seleccionada en ida
+                const esRecomendada = familiaRecomendada && familia === familiaRecomendada;
+                const claseRecomendada = esRecomendada ? ' fare-recomendada' : '';
+                const badgeRecomendada = esRecomendada ? '<div class="badge-recomendada">⭐ Recomendado</div>' : '';
+                
+                tarifasHtml += `
+                <div class="fare-option${claseRecomendada}">
+                    ${badgeRecomendada}
+                    <div class="fare-header">
+                        <div class="fare-label">${obtenerEtiquetaFamilia(familia)}</div>
+                        <div class="fare-price">${ofertaBarata.precio} €</div>
+                    </div>
+                    <div class="fare-perks">
+                        ${perks}
+                    </div>
+                    <button class="frc-btn-fare" onclick='abrirModalVuelo(${JSON.stringify(ofertaBarata)})'>Seleccionar</button>
+                </div>`;
+                
+                contadorFamilias++;
+            });
+            
+            tarifasHtml += '</div>';
+            return tarifasHtml;
+        }
+
+        function obtenerEtiquetaFamilia(familia) {
+            const labels = {
+                'Basic': 'Basic',
+                'Comfort': 'Comfort',
+                'Premium': 'Premium'
+            };
+            return labels[familia] || 'Basic';
+        }
+
+        function obtenerPerksVisibles(oferta) {
+            const perks = [];
+            
+            // Maleta
+            if (oferta.con_maleta) {
+                perks.push('<span class="perk-item">✓ Equipaje incluido</span>');
+            } else {
+                perks.push('<span class="perk-item-no">✗ Sin equipaje</span>');
+            }
+            
+            // Cambios
+            const condiciones = oferta.condiciones || {};
+            const changeAllowed = condiciones.change_before_departure?.allowed;
+            if (changeAllowed) {
+                perks.push('<span class="perk-item">✓ Cambios permitidos</span>');
+            } else {
+                perks.push('<span class="perk-item-no">✗ Sin cambios</span>');
+            }
+            
+            // Reembolso
+            const refundAllowed = condiciones.refund_before_departure?.allowed;
+            if (refundAllowed) {
+                perks.push('<span class="perk-item">✓ Reembolsable</span>');
+            } else {
+                perks.push('<span class="perk-item-no">✗ No reembolsable</span>');
+            }
+            
+            return perks.join('');
+        }
+
+        // --- MODAL DETALLE (LOGOS ARREGLADOS + DISEÑO) ---
+        function abrirModalVuelo(v) {
+            vueloSeleccionado = v;
+            document.getElementById('fm-route').innerText = `${v.origen} ➝ ${v.destino}`;
+            document.getElementById('fm-airline').innerText = `${v.aerolinea} - Total: ${v.duracion}`;
+            document.getElementById('fm-total-price').innerText = `${v.precio}€`;
+
+            document.getElementById('fm-btn-continuar').onclick = () => {
+                if (esViajeRedondo && modoSeleccion === 'ida') {
+                    vueloIdaSeleccionado = v;
+                    // FASE 4: Guardar familia tarifaria seleccionada para sincronizar con vuelta
+                    familiaTarifariaIdaSeleccionada = v.familia_tarifaria || 'Basic';
+                    cerrarModalVuelo();
+                    mostrarVuelosVuelta();
+                } else if (esViajeRedondo && modoSeleccion === 'vuelta') {
+                    vueloVueltaSeleccionado = v;
+                    cerrarModalVuelo();
+                    abrirFormularioCompra();
+                } else {
+                    vueloIdaSeleccionado = v;
+                    cerrarModalVuelo();
+                    abrirFormularioCompra();
+                }
+            };
+
+            const tl = document.getElementById('fm-timeline');
+            tl.innerHTML = '';
+
+            if (v.segmentos && v.segmentos.length > 0) {
+                v.segmentos.forEach((seg, index) => {
+                    const logo = seg.img_logo ? seg.img_logo : "https://pics.avs.io/64/64/AA.png";
+
+                    const html = `
+            <div class="segment-block">
+                <div class="timeline-point">
+                    <div class="tp-dot"></div>
+                    <div>
+                        <span class="tp-time">${seg.hora_salida}</span> 
+                        <span style="font-size:0.75rem; color:#64748b; margin-left:4px;">${seg.fecha_salida}</span>
+                        <span class="tp-code">${seg.salida}</span>
+                    </div>
+                </div>
+                <div class="segment-path"><div class="sp-line"></div><div class="flight-info-card">
+                    <div class="fic-airline"><img src="${logo}" style="width:20px;"> ${seg.aerolinea} <span style="font-weight:400; font-size:0.8rem; color:#94a3b8;">(${seg.vuelo})</span></div>
+                    <div class="fic-details"><span>⏱ ${seg.duracion}</span><span>💺 ${seg.avion}</span></div>
+                </div></div>
+                <div class="timeline-point">
+                    <div class="tp-dot" style="border-color: #10b981;"></div>
+                    <div>
+                        <span class="tp-time">${seg.hora_llegada}</span> 
+                        <span style="font-size:0.75rem; color:#64748b; margin-left:4px;">${seg.fecha_llegada}</span>
+                        <span class="tp-code">${seg.llegada}</span>
+                    </div>
+                </div>
+            </div>`;
+                    tl.innerHTML += html;
+                    if (index < v.segmentos.length - 1) {
+                        const duracionEscala = seg.escala_duracion ? ` - ⏳ ${seg.escala_duracion}` : '';
+                        tl.innerHTML += `<div class="layover-alert">🛑 Escala en ${seg.ciudad_llegada || seg.llegada} (${seg.llegada})${duracionEscala}</div>`;
+                    }
+                });
+            }
+
+            document.getElementById('modal-detalle-vuelo').style.display = 'flex';
+
+            // --- MOSTRAR CONDICIONES ---
+            const conditionsContainer = document.getElementById('fm-conditions');
+            if (conditionsContainer) {
+                let htmlCond = '';
+                const cond = v.condiciones || {};
+
+                // Cambio
+                if (cond.change_before_departure?.allowed) {
+                    const penalty = cond.change_before_departure.penalty_amount
+                        ? `${cond.change_before_departure.penalty_amount} ${cond.change_before_departure.penalty_currency}`
+                        : 'Gratis';
+                    htmlCond += `<span class="badge-cond check">✅ Cambios: ${penalty}</span>`;
+                } else {
+                    htmlCond += `<span class="badge-cond cross">❌ No permite cambios</span>`;
+                }
+
+                // Reembolso
+                if (cond.refund_before_departure?.allowed) {
+                    const penalty = cond.refund_before_departure.penalty_amount
+                        ? `${cond.refund_before_departure.penalty_amount} ${cond.refund_before_departure.penalty_currency}`
+                        : 'Gratis';
+                    htmlCond += `<span class="badge-cond check">✅ Reembolsable: ${penalty}</span>`;
+                } else {
+                    htmlCond += `<span class="badge-cond cross">❌ No reembolsable</span>`;
+                }
+
+                conditionsContainer.innerHTML = htmlCond;
+            }
+
+            // FASE 5: Lazy-load de servicios extra (solo cargar cuando sea necesario)
+            // No cargar inmediatamente, esperar a que el modal esté visible
+            const serviciosContainer = document.getElementById('contenedor-servicios-extra');
+            if (serviciosContainer) {
+                serviciosContainer.innerHTML = '<div class="services-skeleton"><div class="skeleton-line"></div><div class="skeleton-line"></div><div class="skeleton-line"></div></div>';
+                
+                // Cargar servicios después de un pequeño delay (priorizar renderizado del modal)
+                setTimeout(() => {
+                    if (typeof cargarServiciosExtra === 'function') {
+                        cargarServiciosExtra(v.id);
+                    }
+                }, 300);
+            }
+        }
+
+        function mostrarVuelosVuelta() {
+            modoSeleccion = 'vuelta';
+            vuelosGlobales = vuelosVueltaGlobales;
+            actualizarOpcionesAerolineas();
+
+            const grid = document.getElementById('resultados-busqueda-container');
+            grid.innerHTML = '';
+
+            const headerTitulo = document.createElement('div');
+            headerTitulo.style.cssText = 'text-align:center; padding:20px; background:#f0fdf4; border-radius:12px; margin-bottom:20px; border:2px solid #10b981;';
+            
+            // FASE 4: Agregar mensaje de sincronización de familia tarifaria
+            const mensajeFamilia = familiaTarifariaIdaSeleccionada 
+                ? `<p style="margin:8px 0 0 0; color:#6366f1; font-size:0.9rem; font-weight:600;">⭐ Tarifas <strong>${obtenerEtiquetaFamilia(familiaTarifariaIdaSeleccionada)}</strong> resaltadas para ti</p>`
+                : '';
+            
+            headerTitulo.innerHTML = `
+        <h3 style="color:#10b981; font-size:1.5rem; margin:0 0 10px 0;">✈️ Selecciona tu vuelo de VUELTA</h3>
+        <p style="margin:0; color:#64748b; font-size:0.95rem;">Vuelo de ida seleccionado: ${vueloIdaSeleccionado.origen} → ${vueloIdaSeleccionado.destino} (${vueloIdaSeleccionado.precio}€)</p>
+        ${mensajeFamilia}
+    `;
+            grid.appendChild(headerTitulo);
+
+            actualizarEtiquetasResumen();
+            aplicarFiltrosYRenderizar();
+
+            document.getElementById('seccion-resultados').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cerrarModalVuelo() { document.getElementById('modal-detalle-vuelo').style.display = 'none'; }
+
+        // --- LÓGICA DE FORMULARIO DE COMPRA Y EXTRAS ---
+        function abrirFormularioCompra() {
+            cerrarModalVuelo();
+            document.getElementById('modal-formulario-compra').style.display = 'flex';
+            extraMaletas = 0;
+            servicioSeleccionadoId = null;
+            actualizarPrecioUI();
+            renderizarResumenVuelos();
+            generarFormulariosPasajeros();
+            if (vueloIdaSeleccionado) {
+                cargarServiciosExtra(vueloIdaSeleccionado.id);
+            }
+        }
+
+        function generarFormulariosPasajeros() {
+            const contenedor = document.getElementById('formularios-pasajeros');
+            let html = '';
+
+            let numPasajero = 1;
+
+            for (let i = 0; i < pasajeros.adultos; i++) {
+                html += generarFormularioPasajero(numPasajero, 'Adulto', i);
+                numPasajero++;
+            }
+
+            for (let i = 0; i < pasajeros.ninos; i++) {
+                html += generarFormularioPasajero(numPasajero, 'Niño', i);
+                numPasajero++;
+            }
+
+            contenedor.innerHTML = html;
+        }
+
+        // FASE 6: Validación en tiempo real
+        function validarCampo(input, tipo, passengerType = null) {
+            const formGroup = input.closest('.form-group-validated');
+            const errorSpan = formGroup.querySelector('.error-message');
+            const iconSpan = formGroup.querySelector('.validation-icon');
+            const value = input.value.trim();
+
+            // Limpiar estados previos
+            formGroup.classList.remove('has-error', 'has-success');
+            errorSpan.textContent = '';
+            iconSpan.textContent = '';
+
+            if (!value) {
+                mostrarError(formGroup, errorSpan, iconSpan, 'Este campo es obligatorio');
+                return false;
+            }
+
+            switch(tipo) {
+                case 'nombre':
+                case 'apellidos':
+                    if (value.length < 2) {
+                        mostrarError(formGroup, errorSpan, iconSpan, 'Debe tener al menos 2 caracteres');
+                        return false;
+                    }
+                    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(value)) {
+                        mostrarError(formGroup, errorSpan, iconSpan, 'Solo se permiten letras y espacios');
+                        return false;
+                    }
+                    break;
+
+                case 'email':
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) {
+                        mostrarError(formGroup, errorSpan, iconSpan, 'Email inválido (ej: nombre@ejemplo.com)');
+                        return false;
+                    }
+                    break;
+
+                case 'telefono':
+                    const phoneRegex = /^[+]?[0-9\s()-]{9,}$/;
+                    if (!phoneRegex.test(value)) {
+                        mostrarError(formGroup, errorSpan, iconSpan, 'Teléfono inválido (mín. 9 dígitos)');
+                        return false;
+                    }
+                    break;
+
+                case 'dni':
+                    if (value.length < 8) {
+                        mostrarError(formGroup, errorSpan, iconSpan, 'DNI/Pasaporte debe tener al menos 8 caracteres');
+                        return false;
+                    }
+                    break;
+
+                case 'fecha':
+                    const parseBirthDate = (raw) => {
+                        if (!raw) return null;
+                        if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+                            const [y, m, d] = raw.split('-').map(Number);
+                            return new Date(y, m - 1, d);
+                        }
+                        if (/^\d{2}\/\d{2}\/\d{4}$/.test(raw)) {
+                            const [d, m, y] = raw.split('/').map(Number);
+                            return new Date(y, m - 1, d);
+                        }
+                        const parsed = new Date(raw);
+                        return Number.isNaN(parsed.getTime()) ? null : parsed;
+                    };
+
+                    const fechaNac = parseBirthDate(value);
+                    const hoy = new Date();
+                    const edad = (hoy - fechaNac) / (1000 * 60 * 60 * 24 * 365.25);
+                    let tipoPasajero = String(passengerType || input.dataset.passengerType || '').toLowerCase();
+                    if (!tipoPasajero) {
+                        if (input.id.includes('pax-adulto-')) tipoPasajero = 'adult';
+                        if (input.id.includes('pax-nino-')) tipoPasajero = 'child';
+                    }
+                    if (!tipoPasajero) {
+                        const sectionTitle = (input.closest('.pasajero-form-section')?.querySelector('h5')?.textContent || '').toLowerCase();
+                        if (sectionTitle.includes('adulto')) tipoPasajero = 'adult';
+                        if (sectionTitle.includes('niño') || sectionTitle.includes('nino')) tipoPasajero = 'child';
+                    }
+                    const esNino = tipoPasajero === 'child';
+                    const esAdulto = tipoPasajero === 'adult';
+
+                    if (!fechaNac || Number.isNaN(fechaNac.getTime())) {
+                        mostrarError(formGroup, errorSpan, iconSpan, 'Fecha inválida');
+                        return false;
+                    }
+                    if (fechaNac > hoy) {
+                        mostrarError(formGroup, errorSpan, iconSpan, 'La fecha no puede ser futura');
+                        return false;
+                    }
+                    if (edad > 120) {
+                        mostrarError(formGroup, errorSpan, iconSpan, 'Por favor, verifica la fecha de nacimiento');
+                        return false;
+                    }
+                    if (esNino && edad >= 18) {
+                        mostrarError(formGroup, errorSpan, iconSpan, 'Un niño debe ser menor de 18 años');
+                        return false;
+                    }
+                    if (esAdulto && edad < 18) {
+                        mostrarError(formGroup, errorSpan, iconSpan, 'Un adulto debe tener 18 años o más');
+                        return false;
+                    }
+                    break;
+            }
+
+            // Campo válido
+            formGroup.classList.add('has-success');
+            iconSpan.textContent = '✓';
+            return true;
+        }
+
+        function mostrarError(formGroup, errorSpan, iconSpan, mensaje) {
+            formGroup.classList.add('has-error');
+            errorSpan.textContent = mensaje;
+            iconSpan.textContent = '✕';
+        }
+
+        function limpiarError(input) {
+            const formGroup = input.closest('.form-group-validated');
+            if (formGroup) {
+                formGroup.classList.remove('has-error', 'has-success');
+                formGroup.querySelector('.error-message').textContent = '';
+                formGroup.querySelector('.validation-icon').textContent = '';
+            }
+        }
+
+        function generarFormularioPasajero(numero, tipo, index) {
+            const tipoLower = tipo.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const prefijo = `pax-${tipoLower}-${index}`;
+
+            return `
+        <div class="pasajero-form-section" style="background: white; border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+            <h5 style="margin: 0 0 15px 0; color: #6366f1; font-size: 1rem; font-weight: 700;">
+                👤 Pasajero ${numero} - ${tipo}
+            </h5>
+            <div class="purchase-form-grid">
+                <div class="form-group form-group-validated">
+                    <label>Nombre</label>
+                    <input type="text" id="${prefijo}-nombre" name="${prefijo}-nombre" required 
+                           placeholder="Tal cual aparece en el documento" 
+                           onblur="validarCampo(this, 'nombre')" 
+                           oninput="limpiarError(this)">
+                    <span class="validation-icon"></span>
+                    <span class="error-message"></span>
+                </div>
+                <div class="form-group form-group-validated">
+                    <label>Apellidos</label>
+                    <input type="text" id="${prefijo}-apellidos" name="${prefijo}-apellidos" required 
+                           placeholder="Apellidos completos" 
+                           onblur="validarCampo(this, 'apellidos')" 
+                           oninput="limpiarError(this)">
+                    <span class="validation-icon"></span>
+                    <span class="error-message"></span>
+                </div>
+                <div class="form-group form-group-validated">
+                    <label>DNI / Pasaporte</label>
+                    <input type="text" id="${prefijo}-dni" name="${prefijo}-dni" required 
+                           placeholder="Número de documento" 
+                           onblur="validarCampo(this, 'dni')" 
+                           oninput="limpiarError(this)">
+                    <span class="validation-icon"></span>
+                    <span class="error-message"></span>
+                </div>
+                <div class="form-group form-group-validated">
+                    <label>Fecha Nacimiento</label>
+                    <input type="date" id="${prefijo}-nacimiento" name="${prefijo}-nacimiento" required 
+                           data-passenger-type="${tipoLower === 'adulto' ? 'adult' : 'child'}"
+                           onblur="validarCampo(this, 'fecha', '${tipoLower === 'adulto' ? 'adult' : 'child'}')" 
+                           onchange="validarCampo(this, 'fecha', '${tipoLower === 'adulto' ? 'adult' : 'child'}')"
+                           oninput="limpiarError(this)">
+                    <span class="validation-icon"></span>
+                    <span class="error-message"></span>
+                </div>
+                ${numero === 1 ? `
+                <div class="form-group form-group-validated">
+                    <label>Email</label>
+                    <input type="email" id="${prefijo}-email" name="${prefijo}-email" required 
+                           placeholder="tucorreo@ejemplo.com" 
+                           inputmode="email" 
+                           autocomplete="email" 
+                           onblur="validarCampo(this, 'email')" 
+                           oninput="limpiarError(this)">
+                    <span class="validation-icon"></span>
+                    <span class="error-message"></span>
+                </div>
+                <div class="form-group form-group-validated">
+                    <label>Teléfono</label>
+                    <input type="tel" id="${prefijo}-telefono" name="${prefijo}-telefono" required 
+                           placeholder="+34 600 000 000" 
+                           inputmode="tel" 
+                           autocomplete="tel" 
+                           onblur="validarCampo(this, 'telefono')" 
+                           oninput="limpiarError(this)">
+                    <span class="validation-icon"></span>
+                    <span class="error-message"></span>
+                </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+        }
+
+        function renderizarResumenVuelos() {
+            const contenedor = document.getElementById('resumen-vuelos-seleccionados');
+            let html = '<h4 style="margin:0 0 15px 0; color:#1e293b; font-size:1.1rem; font-weight:800;">📋 Resumen de Vuelos Seleccionados</h4>';
+
+            if (vueloIdaSeleccionado) {
+                html += `
+        <div style="background:white; padding:15px; border-radius:8px; margin-bottom:12px; border-left:4px solid #6366f1;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span style="font-weight:700; color:#1e293b;">✈️ Vuelo de IDA</span>
+                <span style="font-size:1.3rem; font-weight:900; color:#6366f1;">${vueloIdaSeleccionado.precio}€</span>
+            </div>
+            <div style="font-size:0.9rem; color:#64748b; display:flex; gap:20px;">
+                <span><strong>${vueloIdaSeleccionado.origen}</strong> → <strong>${vueloIdaSeleccionado.destino}</strong></span>
+                <span>${vueloIdaSeleccionado.hora_salida} - ${vueloIdaSeleccionado.hora_llegada}</span>
+                <span>${vueloIdaSeleccionado.duracion}</span>
+            </div>
+            <div style="font-size:0.85rem; color:#94a3b8; margin-top:8px;">${vueloIdaSeleccionado.aerolinea}</div>
+        </div>`;
+            }
+
+            if (esViajeRedondo && vueloVueltaSeleccionado) {
+                html += `
+        <div style="background:white; padding:15px; border-radius:8px; margin-bottom:12px; border-left:4px solid #10b981;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span style="font-weight:700; color:#1e293b;">✈️ Vuelo de VUELTA</span>
+                <span style="font-size:1.3rem; font-weight:900; color:#10b981;">${vueloVueltaSeleccionado.precio}€</span>
+            </div>
+            <div style="font-size:0.9rem; color:#64748b; display:flex; gap:20px;">
+                <span><strong>${vueloVueltaSeleccionado.origen}</strong> → <strong>${vueloVueltaSeleccionado.destino}</strong></span>
+                <span>${vueloVueltaSeleccionado.hora_salida} - ${vueloVueltaSeleccionado.hora_llegada}</span>
+                <span>${vueloVueltaSeleccionado.duracion}</span>
+            </div>
+            <div style="font-size:0.85rem; color:#94a3b8; margin-top:8px;">${vueloVueltaSeleccionado.aerolinea}</div>
+        </div>`;
+            }
+
+            contenedor.innerHTML = html;
+        }
+        function cerrarModalCompra() { document.getElementById('modal-formulario-compra').style.display = 'none'; }
+
+        // --- VARIABLES GLOBALES (MOVIDAS AL INICIO) ---
+        function actualizarPrecioUI() {
+            if (!vueloIdaSeleccionado) return;
+
+            let precioBase = vueloIdaSeleccionado.precio;
+            if (esViajeRedondo && vueloVueltaSeleccionado) {
+                precioBase += vueloVueltaSeleccionado.precio;
+            }
+
+            // Calcular precio de asientos
+            let precioAsientos = 0;
+            if (typeof asientosSeleccionados !== 'undefined') {
+                asientosSeleccionados.forEach(s => precioAsientos += s.precio);
+            }
+
+            // NOTA: extraMaletas se actualiza desde services.js (seleccionarServicio)
+            // No recalcular desde checkboxes antiguos para evitar conflictos
+
+            const total = precioBase + extraMaletas + precioAsientos;
+            const display = document.getElementById('precio-final-display');
+            if (display) display.innerText = total.toFixed(2) + '€';
+
+            // Actualizar botón de pago si existe
+            const btn = document.querySelector('#form-compra-vuelo button[type="submit"]');
+            if (btn) btn.innerText = `Pagar ${total.toFixed(2)}€`;
+        }
+
+        async function procesarPagoFinal() {
+            if (!document.getElementById('check-legal').checked) {
+                alert("Debes aceptar la Política de Privacidad y las Condiciones Generales.");
+                return;
+            }
+
+            const btn = document.querySelector('#form-compra-vuelo button[type="submit"]');
+            btn.innerText = "Procesando...";
+            btn.disabled = true;
+
+            // Recolectar pasajeros
+            let listaPasajeros = [];
+
+            const hoy = new Date();
+            for (let i = 0; i < pasajeros.adultos; i++) {
+                const fechaInput = document.getElementById(`pax-adulto-${i}-nacimiento`);
+                if (!fechaInput || !validarCampo(fechaInput, 'fecha', 'adult')) {
+                    alert(`Revisa la fecha de nacimiento del pasajero adulto ${i + 1}. Debe tener 18 años o más.`);
+                    btn.innerText = "Pagar";
+                    btn.disabled = false;
+                    return;
+                }
+            }
+            for (let i = 0; i < pasajeros.ninos; i++) {
+                const fechaInput = document.getElementById(`pax-nino-${i}-nacimiento`);
+                if (!fechaInput || !validarCampo(fechaInput, 'fecha', 'child')) {
+                    alert(`Revisa la fecha de nacimiento del pasajero niño ${i + 1}. Debe ser menor de 18 años.`);
+                    btn.innerText = "Pagar";
+                    btn.disabled = false;
+                    return;
+                }
+            }
+
+            // Obtener IDs de pasajeros del offer original (Duffel requiere estos IDs)
+            // Fase 1: UI simplificada a Adultos + Niños
+
+            const duffelPassengers = vueloIdaSeleccionado.passengers || [];
+            const duffelAdults = duffelPassengers.filter(p => p.type === 'adult');
+            const duffelChildren = duffelPassengers.filter(p => p.type === 'child');
+            const providerSeleccionado = String(vueloIdaSeleccionado.source || 'Duffel');
+
+            console.log("IDs Duffel:", { duffelAdults, duffelChildren });
+
+            // Adultos
+            for (let i = 0; i < pasajeros.adultos; i++) {
+                const prefijo = `pax-adulto-${i}`;
+                const duffelPax = duffelAdults[i] || {}; // Fallback vacío si algo falla
+
+                const pasajero = {
+                    id: providerSeleccionado === 'Duffel' ? duffelPax.id : undefined,
+                    type: 'adult',
+                    title: 'mr', // TODO: Añadir selector de título en formulario
+                    given_name: document.getElementById(`${prefijo}-nombre`).value,
+                    family_name: document.getElementById(`${prefijo}-apellidos`).value,
+                    born_on: document.getElementById(`${prefijo}-nacimiento`).value,
+                    gender: 'm', // TODO: Añadir selector de género
+                    identity_documents: [{
+                        type: 'passport', // TODO: detectar tipo de documento
+                        unique_identifier: document.getElementById(`${prefijo}-dni`).value,
+                        expires_on: '2030-12-31', // TODO: añadir campo de expiración
+                        issuing_country_code: 'ES' // TODO: añadir selector de país
+                    }]
+                };
+
+                // Email y teléfono solo del primer pasajero
+                if (i === 0) {
+                    pasajero.email = document.getElementById(`${prefijo}-email`).value;
+                    let phone = document.getElementById(`${prefijo}-telefono`).value;
+
+                    // Limpieza agresiva: solo números y +
+                    phone = phone.replace(/[^0-9+]/g, '');
+
+                    // Convertir prefijo 00 a +
+                    if (phone.startsWith('00')) {
+                        phone = '+' + phone.substring(2);
+                    }
+
+                    // Si no empieza con +, asumir España (+34) si tiene 9 dígitos (ej: 666...)
+                    if (!phone.startsWith('+')) {
+                        if (phone.length === 9 && (phone.startsWith('6') || phone.startsWith('7') || phone.startsWith('9'))) {
+                            phone = '+34' + phone;
+                        } else {
+                            // Si no es un número local claro, alertar o intentar añadir +
+                            // Intentamos añadir + por si puso el código sin +
+                            phone = '+' + phone;
+                        }
+                    }
+                    pasajero.phone_number = phone;
+                }
+
+                listaPasajeros.push(pasajero);
+            }
+
+            // Niños
+            for (let i = 0; i < pasajeros.ninos; i++) {
+                const prefijo = `pax-nino-${i}`;
+                const duffelPax = duffelChildren[i] || {};
+
+                listaPasajeros.push({
+                    id: providerSeleccionado === 'Duffel' ? duffelPax.id : undefined,
+                    type: 'child',
+                    title: 'mstr',
+                    given_name: document.getElementById(`${prefijo}-nombre`).value,
+                    family_name: document.getElementById(`${prefijo}-apellidos`).value,
+                    born_on: document.getElementById(`${prefijo}-nacimiento`).value,
+                    gender: 'm',
+                    identity_documents: [{
+                        type: 'passport',
+                        unique_identifier: document.getElementById(`${prefijo}-dni`).value,
+                        expires_on: '2030-12-31',
+                        issuing_country_code: 'ES'
+                    }]
+                });
+            }
+
+            // Calcular precio total
+            let precioVuelos = vueloIdaSeleccionado.precio;
+            if (esViajeRedondo && vueloVueltaSeleccionado) {
+                precioVuelos += vueloVueltaSeleccionado.precio;
+            }
+
+            let precioAsientos = 0;
+            if (typeof asientosSeleccionados !== 'undefined') {
+                asientosSeleccionados.forEach(s => precioAsientos += s.precio);
+            }
+
+            const precioTotal = precioVuelos + extraMaletas + precioAsientos;
+
+            // Preparar payload de servicios
+            let servicesPayload = [];
+            if (window.serviciosSeleccionados && window.serviciosSeleccionados.size > 0) {
+                window.serviciosSeleccionados.forEach(id => {
+                    servicesPayload.push({ id: id, quantity: 1 });
+                });
+            }
+            if (typeof asientosSeleccionados !== 'undefined') {
+                asientosSeleccionados.forEach(s => {
+                    servicesPayload.push({ id: s.serviceId, quantity: 1 });
+                });
+            }
+
+            // Datos del vuelo para guardar
+            const datosVuelo = {
+                origen: vueloIdaSeleccionado.origen,
+                destino: vueloIdaSeleccionado.destino,
+                aerolinea: vueloIdaSeleccionado.aerolinea,
+                source: vueloIdaSeleccionado.source || 'Duffel',
+                fecha_ida: vueloIdaSeleccionado.fecha || new Date().toISOString().split('T')[0],
+                es_viaje_redondo: esViajeRedondo,
+                precio_maletas: extraMaletas,
+                precio_asientos: precioAsientos, // Guardar tambien costo asientos
+                segmentos: vueloIdaSeleccionado.segmentos,
+                services: servicesPayload
+            };
+
+            if (esViajeRedondo && vueloVueltaSeleccionado) {
+                datosVuelo.fecha_vuelta = vueloVueltaSeleccionado.fecha || new Date().toISOString().split('T')[0];
+                datosVuelo.aerolinea_vuelta = vueloVueltaSeleccionado.aerolinea;
+                datosVuelo.source_vuelta = vueloVueltaSeleccionado.source || 'Duffel';
+                datosVuelo.segmentos_vuelta = vueloVueltaSeleccionado.segmentos;
+            }
+
+            const email_cliente = listaPasajeros[0].email;
+            const telefono_cliente = listaPasajeros[0].phone_number;
+
+            const fuenteIda = String(vueloIdaSeleccionado.source || 'Duffel');
+            const fuenteVuelta = String(vueloVueltaSeleccionado?.source || fuenteIda);
+            // FASE TEMPORAL: Amadeus oculto (comentado, no eliminado)
+            // if (fuenteIda !== 'Duffel' || (esViajeRedondo && fuenteVuelta !== 'Duffel')) {
+            //     alert('Vuelo Amadeus detectado: se abrirá checkout alternativo (sin Duffel Payments).');
+            // }
+
+            // FASE TEMPORAL: Amadeus oculto (comentado, no eliminado)
+            // const amadeusOffer = vueloIdaSeleccionado.amadeus_full_offer || null;
+            const amadeusOffer = null;
+
+            try {
+                // 1. Crear reserva en BD
+                console.log('📤 Creando reserva...');
+                const resReserva = await fetch('/api/vuelos/crear-reserva', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        offer_id: vueloIdaSeleccionado.id, // Duffel offer ID
+                        datos_vuelo: datosVuelo,
+                        pasajeros: listaPasajeros,
+                        // FASE TEMPORAL: Amadeus oculto (comentado, no eliminado)
+                        // amadeus_full_offer: amadeusOffer,
+                        precio_total: precioTotal,
+                        email_cliente: email_cliente,
+                        telefono_cliente: telefono_cliente
+                    })
+                });
+
+                const dataReserva = await resReserva.json();
+
+                if (!dataReserva.success) {
+                    throw new Error(dataReserva.error || 'Error creando reserva');
+                }
+
+                console.log(`✅ Reserva creada: ${dataReserva.codigo_reserva}`);
+
+                // Redirigir a la página dedicada de pago
+                window.location.href = `/orden/checkout/${dataReserva.codigo_reserva}`;
+
+            } catch (e) {
+                console.error('❌ Error General:', e);
+                alert(`Error: ${e.message}`);
+                // Restaurar botón
+                const btn = document.getElementById('btn-confirm-payment') || document.getElementById('btn-submit-reserva');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = "Reintentar";
+                    btn.style.display = 'block';
+                }
+            }
+        } // End procesarPagoFinal
+
+        // --- MODAL CONTACTO TOURS ---
+        const TOURS_HABILITADOS = false;
+
+        function abrirModalContacto(nombre, id) {
+            if (!TOURS_HABILITADOS) return;
+            document.getElementById('mc-tour-name').innerText = nombre;
+            document.getElementById('mc-tour-id').value = id;
+            document.getElementById('modal-contacto').style.display = 'flex';
+        }
+
+        function cerrarModalContacto() {
+            document.getElementById('modal-contacto').style.display = 'none';
+        }
+
+        async function enviarSolicitudTour() {
+            const btn = document.querySelector('#form-contacto-tour button');
+            const originalText = btn.innerText;
+            btn.innerText = "Enviando...";
+            btn.disabled = true;
+
+            const data = {
+                tour_id: document.getElementById('mc-tour-id').value,
+                nombre: document.getElementById('mc-nombre').value,
+                apellidos: document.getElementById('mc-apellidos').value,
+                email: document.getElementById('mc-email').value,
+                telefono: document.getElementById('mc-telefono').value,
+                mensaje: document.getElementById('mc-mensaje').value
+            };
+
+            try {
+                const res = await fetch('/api/solicitar-tour', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    alert("¡Solicitud enviada! Nos pondremos en contacto contigo pronto.");
+                    cerrarModalContacto();
+                } else {
+                    alert("Error: " + result.error);
+                }
+            } catch (e) {
+                alert("Error de conexión");
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+            cerrarModalContacto();
+        }
+
+        // Función para ver detalles de tours desde homepage
+        function verTourDesdeHome(tourId) {
+            try {
+                const dataEl = document.getElementById('tours-data');
+                if (!dataEl) return;
+                const toursData = JSON.parse(dataEl.textContent);
+                const tourData = toursData.find(t => t.id === tourId);
+
+                if (tourData) {
+                    window.location.href = `/destinos?tour=${tourId}`;
+                }
+            } catch (e) {
+                console.error("Error parsing tours data", e);
+            }
+        }
     </script>
+
+    <!-- Data Injection for Tours -->
+    <script id="tours-data" type="application/json">
+        {{ (tours_destacados or []) | tojson | safe }}
+    </script>
+    <style>
+        .badge-cond {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 8px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .badge-cond.check {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-cond.cross {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Service Cards (Maletas) */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .service-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .service-card:hover {
+            border-color: #6366f1;
+            background: #f5f7ff;
+        }
+
+        .service-card.selected {
+            border-color: #6366f1;
+            background: #e0e7ff;
+            box-shadow: 0 0 0 2px #6366f1;
+        }
+
+        .service-price {
+            font-weight: 700;
+            color: #1e293b;
+            display: block;
+            margin-top: 4px;
+        }
+    </style>
+
+    <script src="{{ url_for('static', filename='js/services.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <!-- MODAL SELECCION DE ASIENTOS -->
+    <div id="modal-asientos" class="flight-modal-overlay">
+        <div class="flight-modal-content"
+            style="max-width: 900px; height: 90vh; display: flex; flex-direction: column;">
+            <div class="fm-header">
+                <div class="fm-title">
+                    <h3>Selecciona tu Asiento</h3>
+                    <p>Elige tu lugar preferido en el avión</p>
+                </div>
+                <div class="fm-close" onclick="cerrarModalAsientos()">✕</div>
+            </div>
+
+            <div id="seat-map-container"
+                style="flex: 1; overflow-y: auto; background: #fff; padding: 20px; display: flex; flex-direction: column; align-items: center;">
+                <div class="cargando-spinner">↻ Cargando mapa de asientos...</div>
+            </div>
+
+            <div class="seat-legend"
+                style="padding: 15px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; gap: 20px; justify-content: center; font-size: 0.9rem;">
+                <div style="display:flex; align-items:center; gap:5px;">
+                    <div
+                        style="width:20px; height:20px; background:#e0e7ff; border:1px solid #6366f1; border-radius:4px;">
+                    </div> Disponible
+                </div>
+                <div style="display:flex; align-items:center; gap:5px;">
+                    <div
+                        style="width:20px; height:20px; background:#10b981; border:1px solid #059669; border-radius:4px;">
+                    </div> Seleccionado
+                </div>
+                <div style="display:flex; align-items:center; gap:5px;">
+                    <div
+                        style="width:20px; height:20px; background:#e2e8f0; border:1px solid #94a3b8; border-radius:4px;">
+                    </div> Ocupado
+                </div>
+            </div>
+
+            <div class="fm-footer" style="padding: 20px; border-top: 1px solid #e2e8f0; text-align: right;">
+                <span id="seat-price-display"
+                    style="margin-right: 20px; font-weight: bold; font-size: 1.1rem; color: #1e293b;"></span>
+                <button class="fm-btn-buy" onclick="confirmarAsientos()"
+                    style="width: auto; padding: 12px 30px;">CONFIRMAR SELECCIÓN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de Asientos -->
+    <script>
+        // asientosSeleccionados es global
+
+        function abrirSeleccionAsientos() {
+            if (!vueloIdaSeleccionado) return;
+            document.getElementById('modal-asientos').style.display = 'flex';
+            cargarMapaAsientos(vueloIdaSeleccionado.id);
+        }
+
+        function cerrarModalAsientos() {
+            document.getElementById('modal-asientos').style.display = 'none';
+        }
+
+        async function cargarMapaAsientos(offerId) {
+            const container = document.getElementById('seat-map-container');
+            container.innerHTML = '<div class="cargando-spinner">↻ Cargando mapa de asientos...</div>';
+
+            try {
+                const res = await fetch(`/api/vuelos/asientos/${offerId}`);
+                const data = await res.json();
+
+                if (data.success && data.data && data.data.length > 0) {
+                    renderizarMapa(data.data[0]);
+                } else {
+                    mostrarErrorAsientos(container);
+                }
+            } catch (e) {
+                console.error("Error cargando asientos:", e);
+                container.innerHTML = '<p style="color:#ef4444;">Error técnico cargando el mapa.</p>';
+            }
+        }
+
+        function mostrarErrorAsientos(container) {
+            container.innerHTML = `
+                <div style="text-align:center; padding:40px; color:#64748b;">
+                    <div style="font-size:3rem; margin-bottom:15px;">💺</div>
+                    <h3>Mapa no disponible</h3>
+                    <p>Esta aerolínea no ofrece selección de asientos previa.</p>
+                    <p style="margin-top:6px; font-size:0.9rem;">Podrás revisar asientos durante el check-in si la compañía lo permite.</p>
+                    <button onclick="cerrarModalAsientos()" style="margin-top:20px; padding:8px 16px; background:var(--primary); color:white; border:none; border-radius:6px; cursor:pointer;">Cerrar</button>
+                </div>
+            `;
+        }
+
+        function renderizarMapa(seatMap) {
+            const container = document.getElementById('seat-map-container');
+            container.innerHTML = '';
+
+            const fuselage = document.createElement('div');
+            fuselage.className = 'fuselage';
+            fuselage.style.cssText = `display: flex; flex-direction: column; gap: 8px; padding: 20px; background: white; border-radius: 20px; border: 2px solid #e2e8f0; max-width: 100%; overflow-x: auto;`;
+
+            seatMap.cabins.forEach(cabin => {
+                cabin.rows.forEach(row => {
+                    const rowEl = document.createElement('div');
+                    rowEl.className = 'seat-row';
+                    rowEl.style.cssText = `display: flex; gap: 20px; justify-content: center; align-items: center;`;
+
+                    row.sections.forEach(section => {
+                        const sectionEl = document.createElement('div');
+                        sectionEl.className = 'seat-section';
+                        sectionEl.style.cssText = 'display: flex; gap: 4px;';
+
+                        section.elements.forEach(element => {
+                            sectionEl.appendChild(crearElementoMapa(element));
+                        });
+                        rowEl.appendChild(sectionEl);
+                    });
+                    fuselage.appendChild(rowEl);
+                });
+            });
+            container.appendChild(fuselage);
+        }
+
+        function crearElementoMapa(element) {
+            const div = document.createElement('div');
+
+            if (element.type === 'seat') {
+                div.className = 'seat-item';
+                div.style.cssText = `width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; cursor: pointer; border: 1px solid #ccc; position: relative;`;
+                div.innerText = element.designator;
+
+                const availableService = element.available_services && element.available_services.length > 0 ? element.available_services[0] : null;
+
+                if (availableService) {
+                    const precio = parseFloat(availableService.total_amount);
+
+                    // Color-coding based on price (heuristic)
+                    // We don't have a baseline "standard" price easily, so we can check metadata or just use price
+                    // For now, let's just make expensive seats a slightly different shade or adding a title
+
+                    div.style.background = '#e0e7ff';
+                    div.style.borderColor = '#6366f1';
+                    div.style.color = '#4338ca';
+                    div.title = `Asiento ${element.designator}: ${precio.toFixed(2)}€`; // Tooltip
+
+                    // Highlight premium seats (arbitrary threshold or metadata check could go here)
+                    // If metadata indicates extra legroom, we could change color.
+                    // For now, the tooltip is the most accurate way to show "it depends".
+
+                    if (asientosSeleccionados.find(s => s.serviceId === availableService.id)) {
+                        marcarAsientoSeleccionado(div);
+                    }
+
+                    div.onclick = () => toggleSeleccionAsiento(div, element, availableService);
+                } else {
+                    div.style.background = '#e2e8f0';
+                    div.style.color = '#94a3b8';
+                    div.style.cursor = 'not-allowed';
+                    div.title = 'No disponible';
+                }
+            } else if (element.type === 'lavatory') {
+                div.innerText = '🚻';
+                div.style.width = '32px';
+                div.style.textAlign = 'center';
+            } else if (element.type === 'galley') {
+                div.innerText = '☕';
+                div.style.width = '32px';
+                div.style.textAlign = 'center';
+            } else {
+                div.style.width = '20px'; // Pasillo
+            }
+            return div;
+        }
+
+        function marcarAsientoSeleccionado(div) {
+            div.style.background = '#10b981';
+            div.style.borderColor = '#059669';
+            div.style.color = 'white';
+        }
+
+        function desmarcarAsiento(div) {
+            div.style.background = '#e0e7ff';
+            div.style.borderColor = '#6366f1';
+            div.style.color = '#4338ca';
+        }
+
+        function toggleSeleccionAsiento(div, element, service) {
+            const index = asientosSeleccionados.findIndex(s => s.serviceId === service.id);
+
+            if (index > -1) {
+                asientosSeleccionados.splice(index, 1);
+                desmarcarAsiento(div);
+            } else {
+                // Remove existing selection for this passenger (assuming 1 pax for now)
+                if (asientosSeleccionados.length > 0) {
+                    // Find previously selected and unmark conceptually (UI update simplified)
+                    asientosSeleccionados = [];
+                    // Re-render whole map is expensive, so just clear visually?
+                    // For MVP, just allow one. In production, we'd track multiple pax.
+                    document.querySelectorAll('.seat-item').forEach(el => {
+                        if (el.style.background === 'rgb(16, 185, 129)') { // crude check
+                            desmarcarAsiento(el);
+                        }
+                    });
+                }
+
+                asientosSeleccionados.push({
+                    serviceId: service.id,
+                    precio: parseFloat(service.total_amount),
+                    designator: element.designator
+                });
+                marcarAsientoSeleccionado(div);
+            }
+            // Actualizar precio en tiempo real
+            const priceDisplay = document.getElementById('seat-price-display');
+            if (asientosSeleccionados.length > 0) {
+                const total = asientosSeleccionados.reduce((sum, s) => sum + s.precio, 0);
+                priceDisplay.innerText = `Total: ${total.toFixed(2)}€`;
+            } else {
+                priceDisplay.innerText = '';
+            }
+        }
+
+        function confirmarAsientos() {
+            cerrarModalAsientos();
+            actualizarPrecioUI();
+
+            // Show feedback
+            const btn = document.getElementById('btn-open-seats');
+            if (btn) {
+                if (asientosSeleccionados.length > 0) {
+                    btn.innerHTML = `✅ ${asientosSeleccionados[0].designator} (+${asientosSeleccionados[0].precio}€)`;
+                    btn.style.background = '#dcfce7';
+                    btn.style.color = '#15803d';
+                } else {
+                    btn.innerHTML = '💺 Seleccionar Asientos';
+                    btn.style.background = '';
+                    btn.style.color = '';
+                }
+            }
+        }
+    </script>
+
+
+<!-- CSS para Phase 3: Advanced Search -->
+<style>
+    .search-tab {
+        padding: 12px 24px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: none;
+        border-radius: 12px 12px 0 0;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        backdrop-filter: blur(10px);
+    }
+
+    .search-tab.active {
+        background: white;
+        color: var(--primary);
+    }
+
+    .search-tab:hover:not(.active) {
+        background: rgba(255, 255, 255, 0.2);
+    }
+</style>
+
+<!-- JS para Phase 3: Advanced Search -->
+<script>
+    let searchMode = 'rt'; // rt, ow
+
+    function setSearchMode(mode) {
+        // Modo búsqueda fijo: Standard (Ida/Vuelta auto-detectado logic internal)
+        console.log("Modo fijo: Standard");
+    }
+
+    // Alias para compatibilidad con el botón
+    window.ejecutarBusqueda = animarBusquedaRSW;
+
+
+</script>
+
 </body>
+
 </html>

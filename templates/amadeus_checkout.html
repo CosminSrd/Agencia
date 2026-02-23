@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Amadeus</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .card {
+            max-width: 760px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+
+        .info {
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 8px 0;
+        }
+
+        .alert {
+            margin-top: 12px;
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 12px;
+            border-radius: 8px;
+            color: #1e3a8a;
+        }
+
+        .actions {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            border: none;
+            cursor: pointer;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #1e293b;
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        #status {
+            margin-top: 8px;
+            color: #334155;
+            min-height: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>Checkout Amadeus</h1>
+        <p class="info">Reserva externa a Duffel. El pago se procesa por Stripe y la emisión queda pendiente para el equipo.</p>
+
+        <div class="row"><span>Código de reserva</span><strong>{{ reserva.codigo_reserva }}</strong></div>
+        <div class="row"><span>Email cliente</span><strong>{{ reserva.email_cliente }}</strong></div>
+        <div class="row"><span>Total</span><strong>{{ reserva.precio_total }} EUR</strong></div>
+        <div class="row"><span>Origen</span><strong>{{ reserva.datos_vuelo.origen if reserva.datos_vuelo else '-' }}</strong></div>
+        <div class="row"><span>Destino</span><strong>{{ reserva.datos_vuelo.destino if reserva.datos_vuelo else '-' }}</strong></div>
+
+        <div class="alert">
+            Tras pagar, el estado pasará a <strong>PAGADO_PENDIENTE_EMISION</strong> para emisión manual del billete.
+        </div>
+
+        <div class="actions">
+            <button id="pay-btn" class="btn btn-primary">Pagar con tarjeta</button>
+            <a href="/" class="btn btn-secondary">Cancelar</a>
+        </div>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        const payBtn = document.getElementById('pay-btn');
+        const statusEl = document.getElementById('status');
+
+        payBtn.addEventListener('click', async () => {
+            payBtn.disabled = true;
+            statusEl.innerText = 'Creando sesión segura de pago...';
+
+            try {
+                const res = await fetch('/api/amadeus/create-checkout-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ codigo_reserva: '{{ reserva.codigo_reserva }}' })
+                });
+
+                const data = await res.json();
+                if (!res.ok || !data.success || !data.url) {
+                    throw new Error(data.error || 'No se pudo iniciar el pago');
+                }
+
+                window.location.href = data.url;
+            } catch (err) {
+                statusEl.innerText = 'Error: ' + err.message;
+                payBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

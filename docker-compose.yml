@@ -1,42 +1,113 @@
-version: '3.8'
-
 services:
-  # --- TU APLICACIÓN WEB ---
-  web:
-    build: .
-    container_name: agencia_viajes_web
-    restart: always
-    ports:
-      - "4242:4242"
-    # AQUÍ ESTÁ LA MAGIA DEL AUTO-UPDATE:
-    volumes:
-      - .:/app  # <--- Conecta tu carpeta actual con la del contenedor
-    # Usamos '--reload' para que Gunicorn reinicie si detecta cambios
-    command: gunicorn --bind 0.0.0.0:4242 --workers 4 --threads 2 --reload app:app
+  postgres:
+    image: postgres:16-alpine
+    container_name: agencia_postgres
     environment:
-      - DB_HOST=db  # <--- Importante: Ahora el host se llama 'db', no localhost
-      - DB_USER=root
-      - DB_PASSWORD=tu_password_secreto
-      - DB_NAME=agencia_viajes
-      # Pasa aquí tus claves de API o usa env_file
-      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
-      - AMADEUS_CLIENT_ID=${AMADEUS_CLIENT_ID}
-      - AMADEUS_CLIENT_SECRET=${AMADEUS_CLIENT_SECRET}
-    depends_on:
-      - db
+      POSTGRES_USER: agencia_user
+      POSTGRES_PASSWORD: agencia_pass_2024
+      POSTGRES_DB: agencia_db
+      # Configuración de performance
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=es_ES.UTF-8"
+    ports:
+      # Si el puerto 5432 está ocupado, cambia a 5433:5432
+      # Luego actualiza DB_PORT=5433 en .env
+      - "5433:5432"
+    volumes:
+      # Persistencia de datos
+      - postgres_data:/var/lib/postgresql/data
+      # Script de inicialización (opcional)
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U agencia_user -d agencia_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - agencia_network
 
-  # --- TU BASE DE DATOS MYSQL ---
-  db:
-    image: mysql:8.0
-    container_name: agencia_viajes_db
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: tu_password_secreto
-      MYSQL_DATABASE: agencia_viajes
+  # Redis para caché distribuida
+  redis:
+    image: redis:7-alpine
+    container_name: agencia_redis
     ports:
-      - "3306:3306"
+      - "6379:6379"
     volumes:
-      - mysql_data:/var/lib/mysql # Esto guarda los datos aunque apagues Docker
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - agencia_network
+
+  # Prometheus para métricas
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: agencia_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+    networks:
+      - agencia_network
+
+  # Grafana para visualización
+  grafana:
+    image: grafana/grafana:latest
+    container_name: agencia_grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=redis-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana-datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - agencia_network
+
+  # Opcional: PgAdmin para administración visual
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: agencia_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@agencia.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - agencia_network
 
 volumes:
-  mysql_data:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  agencia_network:
+    driver: bridge

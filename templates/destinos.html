@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='imagenes/logosintexto.png') }}">
+    <title>Destinos | Viatges Carcaixent</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/tours-catalog.css') }}">
+</head>
+
+<body>
+
+    <header class="main-header" id="top">
+        <div class="logo-container">
+            <a href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="Viatges Carcaixent"
+                    class="logo-premium">
+            </a>
+        </div>
+        <nav class="nav-menu">
+            <ul>
+                <li><a href="{{ url_for('home') }}" class="nav-link">Inicio</a></li>
+                <li><a href="{{ url_for('destinos') }}" class="nav-link active">Destinos</a></li>
+                <li><a href="{{ url_for('cruceros') }}" class="nav-link">Cruceros</a></li>
+                <li><a href="{{ url_for('ofertas') }}" class="nav-link">Ofertas</a></li>
+                <li><a href="{{ url_for('checkin') }}" class="nav-link">Check-in</a></li>
+                <li><a href="{{ url_for('contacto') }}" class="nav-link">Contacto</a></li>
+            </ul>
+        </nav>
+        <a href="{{ url_for('presupuesto') }}" class="btn-presupuesto">PEDIR PRESUPUESTO</a>
+    </header>
+
+    <section class="destinos-hero-premium">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span class="hero-tag">Colección Exclusiva 2026</span>
+            <h1 class="hero-title">Donde el mapa <br> <span class="text-serif">se vuelve historia.</span></h1>
+            <p class="hero-subtitle">Itinerarios diseñados a mano por Andrea, sin plantillas ni guiones. Solo tú y el
+                destino.</p>
+
+            <div class="hero-scroll-indicator">
+                <div class="mouse-icon">
+                    <div class="wheel"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    </section>
+
+    <!-- ============================================ -->
+    <!-- CATÁLOGO DINÁMICO CON FILTROS -->
+    <!-- ============================================ -->
+    <section class="catalogo-tours-container">
+        <div class="catalogo-layout">
+
+            <!-- SIDEBAR DE FILTROS -->
+            <aside class="filtros-sidebar">
+                <div class="filtros-header">
+                    <h3>🔍 Filtrar Tours</h3>
+                    <button onclick="resetearFiltros()" class="btn-reset-filtros">Limpiar</button>
+                </div>
+
+                <!-- Búsqueda por texto -->
+                <div class="filtro-grupo">
+                    <label>Buscar</label>
+                    <input type="text" id="search-tours" placeholder="Japón, safari, playa..."
+                        class="input-search-tours">
+                </div>
+
+                <!-- Filtro Continente -->
+                <div class="filtro-grupo">
+                    <label>Continente</label>
+                    <div class="filtro-opciones">
+                        {% for continente in filtros.continentes %}
+                        <label class="filtro-checkbox-label" for="filtro-cont-{{ loop.index }}">
+                            <input type="checkbox" id="filtro-cont-{{ loop.index }}" class="filtro-continente"
+                                value="{{ continente.nombre }}">
+                            <span>{{ continente.nombre }}</span>
+                            <span class="count">({{ continente.count }})</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Filtro Tipo de Viaje -->
+                <div class="filtro-grupo">
+                    <label>Tipo de Viaje</label>
+                    <div class="filtro-opciones">
+                        {% for tipo in filtros.tipos %}
+                        <label class="filtro-checkbox-label" for="filtro-tipo-{{ loop.index }}">
+                            <input type="checkbox" id="filtro-tipo-{{ loop.index }}" class="filtro-tipo"
+                                value="{{ tipo.nombre }}">
+                            <span>{{ tipo.nombre }}</span>
+                            <span class="count">({{ tipo.count }})</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Filtro Precio -->
+                <div class="filtro-grupo">
+                    <label for="precio-slider">Precio Máximo: <span id="precio-display">{{ filtros.precio_max
+                            }}</span>€</label>
+                    <input type="range" id="precio-slider" min="0" max="{{ filtros.precio_max }}"
+                        value="{{ filtros.precio_max }}" step="100" class="slider-precio">
+                    <div class="range-labels">
+                        <span>0€</span>
+                        <span>{{ filtros.precio_max }}€</span>
+                    </div>
+                </div>
+
+                <!-- Filtro Duración -->
+                <div class="filtro-grupo">
+                    <label>Duración</label>
+                    <div class="filtro-opciones-radio">
+                        <label for="dur-short">
+                            <input type="radio" id="dur-short" name="duracion" value="1-7">
+                            <span>1-7 días</span>
+                        </label>
+                        <label for="dur-medium">
+                            <input type="radio" id="dur-medium" name="duracion" value="8-14">
+                            <span>8-14 días</span>
+                        </label>
+                        <label for="dur-long">
+                            <input type="radio" id="dur-long" name="duracion" value="15-999">
+                            <span>15+ días</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Filtro Proveedor -->
+                <div class="filtro-grupo">
+                    <label>Proveedor</label>
+                    <select id="filtro-proveedor" class="select-proveedor">
+                        <option value="">Todos</option>
+                        {% for proveedor in filtros.proveedores %}
+                        <option value="{{ proveedor.nombre }}">
+                            {{ proveedor.nombre }} ({{ proveedor.count }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </aside>
+
+            <!-- ÁREA DE RESULTADOS -->
+            <main class="catalogo-main-area">
+
+                <!-- Barra de herramientas superior -->
+                <div class="results-toolbar">
+                    <div class="results-info">
+                        <h2>Explora Nuestros Destinos</h2>
+                        <p id="results-count">Cargando tours...</p>
+                    </div>
+
+                    <div class="sort-controls">
+                        <label>Ordenar por:</label>
+                        <select id="sort-tours" class="select-sort">
+                            <option value="relevancia">Relevancia</option>
+                            <option value="popular">Más Populares</option>
+                            <option value="precio-asc">Precio: Menor a Mayor</option>
+                            <option value="precio-desc">Precio: Mayor a Menor</option>
+                            <option value="duracion-asc">Duración: Corta a Larga</option>
+                            <option value="duracion-desc">Duración: Larga a Corta</option>
+                            <option value="nuevo">Más Recientes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- GRID DE TOURS (Inyectado dinámicamente) -->
+                <div id="tours-container" class="tours-grid">
+                    <!-- Aquí se inyectan las cards vía JavaScript -->
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p>Cargando tours...</p>
+                    </div>
+                </div>
+
+                <!-- Controles de Paginación -->
+                <div id="pagination-container" class="pagination">
+                    <!-- Inyectado dinámicamente -->
+                </div>
+
+            </main>
+        </div>
+    </section>
+
+    <!-- Modal de Detalles del Tour -->
+    <div id="modal-tour-detalle" class="modal-overlay">
+        <div class="modal-container">
+            <div id="modal-content" class="modal-content-area">
+                <!-- Inyectado dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Mantener secciones inferiores intactas -->
+    <section class="proceso-viaje">
+        <div class="section-title-simple">
+            <span class="eyebrow">Tu viaje en 4 pasos</span>
+            <h2>Del sueño a la <span class="highlight">realidad</span></h2>
+        </div>
+
+        <div class="timeline-luxe">
+            <div class="step">
+                <span class="step-number">01</span>
+                <h4>Elección de Destino</h4>
+                <p>Eliges uno de nuestros destinos exclusivos o nos pides uno a medida.</p>
+            </div>
+            <div class="step">
+                <span class="step-number">02</span>
+                <h4>Propuesta Andrea</h4>
+                <p>Andrea diseña el itinerario optimizando tiempos y experiencias locales.</p>
+            </div>
+            <div class="step">
+                <span class="step-number">03</span>
+                <h4>Reserva Premium</h4>
+                <p>Nos encargamos de todo: vuelos, hoteles boutique y traslados privados.</p>
+            </div>
+            <div class="step">
+                <span class="step-number">04</span>
+                <h4>Viaje sin Preocupaciones</h4>
+                <p>Asistencia 24/7 de Viatges Carcaixent mientras tú solo disfrutas.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="rsw-luxury-faq">
+        <div class="faq-inner">
+            <header class="faq-head-section">
+                <span class="faq-label">EXPERIENCIAS VIATGES CARCAIXENT</span>
+                <h2 class="faq-main-title">Resolviendo tus <span class="gold-gradient">Dudas</span></h2>
+                <div class="gold-line"></div>
+            </header>
+
+            <div class="faq-accordion" id="rswAccordionMain">
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>¿Puedo modificar los itinerarios que aparecen en la web?</span>
+                        <div class="plus-minus-toggle"></div>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-content">
+                            <p>Por supuesto. Los destinos mostrados son propuestas base. En Viatges Carcaixent, Andrea
+                                trabaja cada ruta desde cero, adaptando hoteles, experiencias y ritmo de viaje según tus
+                                preferencias personales.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>¿Qué tipo de cobertura incluyen vuestros viajes?</span>
+                        <div class="plus-minus-toggle"></div>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-content">
+                            <p>Todos nuestros viajes incluyen un seguro de asistencia premium. Además, ofrecemos
+                                coberturas de cancelación de alto nivel para que tu inversión esté protegida ante
+                                cualquier imprevisto antes de la salida.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>¿Cómo se gestionan los pagos de la reserva?</span>
+                        <div class="plus-minus-toggle"></div>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-content">
+                            <p>Para formalizar la reserva se requiere un depósito inicial. El resto del pago se gestiona
+                                de forma fraccionada, debiendo estar completado 30 días antes de la salida, siempre con
+                                total transparencia y seguridad bancaria.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>¿Tendré asistencia durante mi estancia en el destino?</span>
+                        <div class="plus-minus-toggle"></div>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-content">
+                            <p>Dispondrás de un teléfono de asistencia 24/7 tanto local como directamente con nosotros.
+                                Nunca estarás solo; gestionamos cualquier incidencia en tiempo real para que tú solo
+                                disfrutes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="newsletter-destinos">
+        <div class="newsletter-box">
+            <div class="news-text">
+                <span class="badge" style="letter-spacing: 2px;">LISTA PREFERENTE</span>
+                <h4>Newsletter <span class="highlight">Exclusiva</span></h4>
+                <p>Acceda de forma prioritaria a los nuevos itinerarios y experiencias diseñadas por Andrea antes de su
+                    publicación general.</p>
+            </div>
+            <form class="news-form" id="newsletterForm">
+                <div class="input-group">
+                    <label for="news-email" style="display:none;">Email</label>
+                    <input type="email" id="news-email" name="email" placeholder="Escribe tu email aquí..." required>
+                    <button type="submit" class="btn-reserva">Suscribirme</button>
+                </div>
+                <p class="privacy-note">Respetamos tu privacidad. Recibirás máximo 2 correos al mes.</p>
+            </form>
+        </div>
+    </section>
+
+    <section class="garantia-destinos">
+        <div class="bg-pattern-overlay"></div>
+
+        <div class="garantia-container">
+            <div class="garantia-item">
+                <div class="icon-sphere">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M9 20l-5-2V4l5 2m0 14l6-2m-6 2V6m6 12l5 2V6l-5-2m0 14V4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <h4>Agencia Local</h4>
+                <div class="gold-separator"></div>
+                <p>Visítanos en nuestra oficina de <strong>Carcaixent</strong> para una asesoría personalizada.</p>
+            </div>
+
+            <div class="garantia-item">
+                <div class="icon-sphere">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <h4>Garantía de Viaje</h4>
+                <div class="gold-separator"></div>
+                <p>Tu tranquilidad es nuestra prioridad con <strong>coberturas premium</strong> en cada itinerario.</p>
+            </div>
+
+            <div class="garantia-item">
+                <div class="icon-sphere">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M6 5l7 13 7-13H6zM6 5l1.5-2h11l1.5 2M6 5h12" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <h4>Experiencias Únicas</h4>
+                <div class="gold-separator"></div>
+                <p>Sin plantillas. Creamos viajes exclusivos que reflejan <strong>tu estilo personal</strong>.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-info">
+                <a href="{{ url_for('home') }}">
+                    <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="Viatges Carcaixent"
+                        class="footer-logo">
+                </a>
+                <p>Tu agencia de confianza en Carcaixent. Diseñamos experiencias, no solo viajes.</p>
+            </div>
+
+            <div class="footer-links">
+                <h4>EXPLORA</h4>
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Inicio</a></li>
+                    <li><a href="{{ url_for('destinos') }}">Destinos</a></li>
+                    <li><a href="{{ url_for('cruceros') }}">Cruceros</a></li>
+                    <li><a href="{{ url_for('ofertas') }}">Ofertas</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-contact">
+                <h4>CONTACTO</h4>
+                <p class="contact-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="footer-icon">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    Calle Mayor, Carcaixent
+                </p>
+                <p class="contact-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="footer-icon">
+                        <path
+                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l2.27-2.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                        </path>
+                    </svg>
+                    +34 000 000 000
+                </p>
+                <p class="contact-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="footer-icon">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    info@viatgescarcaixent.com
+                </p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Viatges Carcaixent - Todos los derechos reservados.</p>
+            <p class="rsw-signature">Crafted by <span>RSW Studio</span></p>
+        </div>
+    </footer>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+    <script src="{{ url_for('static', filename='js/tours-catalog.js') }}"></script>
+</body>
+
+</html>

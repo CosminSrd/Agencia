@@ -1,7 +1,126 @@
-venv/
+# ============================================
+# Python
+# ============================================
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ============================================
+# Virtual Environments
+# ============================================
+venv/
+env/
+ENV/
+.venv/
 .env
-.DS_Store
-instance/
+
+# ============================================
+# IDE
+# ============================================
 .vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+.project
+.pydevproject
+
+# ============================================
+# Databases
+# ============================================
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.sql
+
+# ============================================
+# Logs
+# ============================================
+*.log
+app.log
+app.log.*
+*.log.*
+
+# ============================================
+# OS Specific
+# ============================================
+.DS_Store
+Thumbs.db
+*Zone.Identifier*
+.AppleDouble
+.LSOverride
+
+# ============================================
+# Temporary Files
+# ============================================
+*.tmp
+*.bak
+*.backup
+*.swp
+*~
+.~*
+.cache/
+
+# ============================================
+# Secrets & Credentials
+# ============================================
+.env
+.env.local
+.env.*.local
+credentials.json
+cookies.txt
+
+# ============================================
+# Build & Distribution
+# ============================================
+/build/
+/dist/
+/*.egg-info/
+
+# ============================================
+# Node (Frontend)
+# ============================================
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# ============================================
+# Facturas && PDFs
+# ============================================
+facturas/*.pdf
+pdf_analizado.txt
+
+# ============================================ 
+# Monitoring & Backup
+# ============================================
+backups/
+*.backup
+*.tar.gz
+
+# ============================================
+# Execution Files
+# ============================================
+stripe.exe
+*.exe

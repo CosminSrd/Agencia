@@ -1,0 +1,12 @@
+# Configuración de Grafana
+# Dashboard para visualizar métricas de la agencia
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
